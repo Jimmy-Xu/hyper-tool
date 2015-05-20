@@ -77,7 +77,6 @@ then
 				| awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){ printf "%s\t%s\t%s",min*1000,max*1000,total/count*1000}else{print ""}; }')
 		fi
 
-
 		echo "${GREEN}${STAT_RLT}${RESET}"
 		echo "========================="
 		echo "${TIME_TYPE}"

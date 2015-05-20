@@ -125,21 +125,50 @@ then
 			echo "old pod status(${GREEN}running${YELLOW}${WHITE}):"
 			echo "====================================${RESET}"
 			sudo ./hyper list | grep -E "("${POD_OLD_LIST}")" | grep -n -E "(running|created)" --color
+			NUM_RUNNING=$(sudo ./hyper list | grep -E "("${POD_OLD_LIST}")" | grep "pod-.*running" | wc -l )
 
 			echo "${BOLD}${WHITE}===================================="
 			echo "new pod status(${YELLOW}created${YELLOW}${WHITE}):"
 			echo "====================================${RESET}"
 			sudo ./hyper list | grep -E "("${POD_NEW_LIST}")" | grep -n -E "(running|created)" --color
+			NUM_CREATED=$(sudo ./hyper list | grep -E "("${POD_NEW_LIST}")" | grep "pod-.*created" | wc -l )
 
 
+			echo "${BOLD}${YELLOW}===================================="
+			echo "check result:"
+			echo "====================================${RESET}"
+			echo "running pod"
+			echo " >required   : ${GREEN}${#POD_OLD[@]}${RESET}"
+			echo " >real       : ${GREEN}${NUM_RUNNING}${RESET}"
+			echo
+			echo "created pod"
+			echo " >required   : ${GREEN}${#POD_NEW[@]}${RESET}"
+			echo " >real       : ${GREEN}${NUM_CREATED}${RESET}"
 
-			######################################################
-			show_message "start replace..." green bold
-			for (( i = 0 ; i < ${#POD_OLD[@]} ; i++ ))
-			do
-				echo "$((i+1)): ${PURPLE}sudo ./hyper replace -o ${POD_OLD[$i]} -n ${POD_NEW[$i]} ${RESET}"
-				( time sudo ./hyper replace -o ${POD_OLD[$i]} -n ${POD_NEW[$i]} ) >>"${LOG_FILE}" 2>&1
-			done
+			if [ ${#POD_OLD[@]} -eq ${NUM_RUNNING} -a ${#POD_NEW[@]} -eq ${NUM_CREATED} ]
+			then
+				######################################################
+				show_message "start replace..." green bold
+				for (( i = 0 ; i < ${#POD_OLD[@]} ; i++ ))
+				do
+					echo "$((i+1)): ${PURPLE}sudo ./hyper replace -o ${POD_OLD[$i]} -n ${POD_NEW[$i]} ${RESET}"
+					( time sudo ./hyper replace -o ${POD_OLD[$i]} -n ${POD_NEW[$i]} ) >>"${LOG_FILE}" 2>&1
+				done
+
+				show_message "replace time stat (ms):" yellow bold
+				echo "========================="
+				echo -e "min\tmax\tavg"
+				echo "-------------------------"
+				STAT_RLT=$(grep -A1 "^Successful to replace" "${LOG_FILE}" | grep real | cut -d"m" -f2 | cut -d"s" -f1 \
+				| awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){ printf "%s\t%s\t%s",min*1000,max*1000,total/count*1000}else{print ""}; }')
+
+				echo "${GREEN}${STAT_RLT}${RESET}"
+				echo "========================="
+
+			else
+				show_message "number of running pod is different with created pod, can not replace" red bold
+			fi
+
 		else
 			show_message "number of old pod is different with new pod, can not replace" red bold
 		fi
