@@ -20,11 +20,13 @@ sudo echo
 show_message "stop all running pod" green bold
 sudo ./hyper list pod | grep "pod-.*running" | awk '{print $1}' | xargs -i sudo ./hyper stop pod {}
 
+sleep 1
 show_message "remove all created pod" green bold
-sudo ./hyper list | grep "pod-.*created" | awk '{print $1}' | xargs -i sudo ./hyper rm {}
+sudo ./hyper list pod | grep "pod-.*created" | awk '{print $1}' | xargs -i sudo ./hyper rm {}
 
+sleep 1
 show_message "kill qemu" green bold
-pkill qemu
+sudo pkill qemu
 
 
 echo -e "\n${BOLD}${YELLOW}===================================================="
