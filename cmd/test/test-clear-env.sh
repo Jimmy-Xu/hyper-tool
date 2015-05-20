@@ -1,9 +1,9 @@
 #!/bin/bash
 
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
-. ${BASE_DIR}/../../common.sh
+. ${BASE_DIR}/../common.sh
 
-show_message "test pod startup time" green bold
+show_message "clear test env( pod & qemu process )" green bold
 
 #check hyper dir
 is_hyper_exist
@@ -15,8 +15,20 @@ is_hyperd_running
 cd "${GOPATH}/src/${HYPER_CLONE_DIR}"
 sudo echo
 
-echo -e "${BOLD}${YELLOW}===================================================="
-echo " check result :"
+
+
+show_message "stop all running pod" green bold
+sudo ./hyper list pod | grep "pod-.*running" | awk '{print $1}' | xargs -i sudo ./hyper stop pod {}
+
+show_message "remove all created pod" green bold
+sudo ./hyper list | grep "pod-.*created" | awk '{print $1}' | xargs -i sudo ./hyper rm {}
+
+show_message "kill qemu" green bold
+pkill qemu
+
+
+echo -e "\n${BOLD}${YELLOW}===================================================="
+echo " check evn again :"
 echo "====================================================${RESET}"
 
 echo -e -n "${BOLD}${WHITE} container(s)     : ${RESET}${PURPLE}"

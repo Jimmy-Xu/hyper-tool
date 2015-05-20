@@ -1,7 +1,7 @@
 #!/bin/bash
 
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
-. ${BASE_DIR}/../../common.sh
+. ${BASE_DIR}/../common.sh
 
 show_message "test pod startup time" green bold
 
@@ -21,9 +21,11 @@ then
 	then
 		CNT=$CHOICE
 
+		LOG_DIR=${BASE_DIR}/../../log
+		LOG_FILE=${LOG_DIR}/time-startup-$(date +'%s').log
 		#ensure log dir
-		mkdir -p ${BASE_DIR}/../../../log
-		LOG_FILE=${BASE_DIR}/../../../log/time-startup.log
+		mkdir -p ${LOG_DIR}
+
 		cd "${GOPATH}/src/${HYPER_CLONE_DIR}"
 		if [ -f "${LOG_FILE}" ]
 		then
