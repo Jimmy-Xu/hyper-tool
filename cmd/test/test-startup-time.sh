@@ -3,7 +3,16 @@
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 . ${BASE_DIR}/../common.sh
 
-show_message "test pod startup time" green bold
+
+if [ $# -eq 1 -a "$1" == "2" ]
+then
+	TIME_TYPE="(internal time)"
+else
+	TIME_TYPE="(system time)"
+fi
+
+
+show_message "test pod startup time ${TIME_TYPE}" green bold
 
 #check hyper dir
 is_hyper_exist
@@ -52,19 +61,26 @@ then
 		echo "ORIG running    : ${GREEN}${BEFORE}${RESET}"
 		echo "CURRENT running : ${GREEN}${AFTER}${RESET}"
 
-		show_message "startup time stat (seconds):" yellow bold
+		show_message "startup time stat (ms):" yellow bold
 		echo "========================="
 		echo -e "min\tmax\tavg"
 		echo "-------------------------"
-		
-		#stat by system time
-		#STAT_RLT=$(grep  -A2 "VM is successful to run" ${LOG_FILE} | grep real | cut -d"m" -f2 | cut -d"s" -f1 \
-		#stat by internal time
-		STAT_RLT=$(grep  -B1 "VM is successful to run"  ${LOG_FILE}  | grep "^Time to" | awk '{print $7}' \
-| awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){avg=total/count}else{avg=""}; printf "%s\t%s\t%s",min,max,avg}')
+
+		if [ $# -eq 1 -a "$1" == "2" ]
+		then
+			#stat by internal time
+			STAT_RLT=$(grep  -B1 "VM is successful to run"  ${LOG_FILE}  | grep "^Time to" | awk '{print $7}' \
+				| awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){avg=total/count}else{avg=""}; printf "%s\t%s\t%s",min,max,avg}')
+		else
+			#stat by system time
+			STAT_RLT=$(grep  -A2 "VM is successful to run" ${LOG_FILE} | grep real | cut -d"m" -f2 | cut -d"s" -f1 \
+				| awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){ printf "%s\t%s\t%s",min*1000,max*1000,total/count*1000}else{print ""}; }')
+		fi
+
 
 		echo "${GREEN}${STAT_RLT}${RESET}"
 		echo "========================="
+		echo "${TIME_TYPE}"
 
 	else
 		show_message "please input a number, [ $CHOICE ] isn't a number" red bold
