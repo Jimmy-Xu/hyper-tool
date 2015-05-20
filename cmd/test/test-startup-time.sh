@@ -56,8 +56,13 @@ then
 		echo "========================="
 		echo -e "min\tmax\tavg"
 		echo "-------------------------"
-		STAT_RLT=$(grep  -A2 "VM is successful to run" ${LOG_FILE} | grep real | cut -d"m" -f2 | cut -d"s" -f1 \
+		
+		#stat by system time
+		#STAT_RLT=$(grep  -A2 "VM is successful to run" ${LOG_FILE} | grep real | cut -d"m" -f2 | cut -d"s" -f1 \
+		#stat by internal time
+		STAT_RLT=$(grep  -B1 "VM is successful to run"  ${LOG_FILE}  | grep "^Time to" | awk '{print $7}' \
 | awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){avg=total/count}else{avg=""}; printf "%s\t%s\t%s",min,max,avg}')
+
 		echo "${GREEN}${STAT_RLT}${RESET}"
 		echo "========================="
 
