@@ -26,11 +26,11 @@ read CHOICE
 
 if [ ! -z ${CHOICE} ]
 then
-	if [[ $CHOICE =~ ^[[:digit:]]+$ ]]
+	if [[ $CHOICE =~ ^[[:digit:]]+$ ]] && [[ ${CHOICE} -ge 1 ]]
 	then
 		CNT=$CHOICE
 
-		LOG_DIR=${BASE_DIR}/../../log
+		LOG_DIR=${BASE_DIR}/../../log/startup/
 		LOG_FILE=${LOG_DIR}/time-startup-$(date +'%s').log
 		#ensure log dir
 		mkdir -p ${LOG_DIR}
@@ -83,6 +83,9 @@ then
 		echo "${TIME_TYPE}"
 
 	else
-		show_message "please input a number, [ $CHOICE ] isn't a number" red bold
+		show_message "please input a number, [ $CHOICE ] isn't a valid number(>=1)" red bold
 	fi
 fi
+
+
+show_message "Done." green bold
