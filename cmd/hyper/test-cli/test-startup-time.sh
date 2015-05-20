@@ -14,12 +14,15 @@ then
 	if [[ $CHOICE =~ ^[[:digit:]]+$ ]]
 	then
 		CNT=$CHOICE
+
+		#ensure log dir
+		mkdir -p ${BASE_DIR}/../../../log
 		LOG_FILE=${BASE_DIR}/../../../log/time-startup.log
 		cd "${GOPATH}/src/${HYPER_CLONE_DIR}"
 		if [ -f "${LOG_FILE}" ]
 		then
-		 \rm -rf "${LOG_FILE}"
-		 show_message "old ${LOG_FILE} deleted" yellow bold
+			\rm -rf "${LOG_FILE}"
+			show_message "old ${LOG_FILE} deleted" yellow bold
 		fi
 
 		BEFORE=`sudo ./hyper list pod | grep running | wc -l`
@@ -46,7 +49,7 @@ then
 		echo -e "min\tmax\tavg"
 		echo "-------------------------"
 		STAT_RLT=$(grep  -A2 "VM is successful to run" ${LOG_FILE} | grep real | cut -d"m" -f2 | cut -d"s" -f1 \
-| awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END {printf "%s\t%s\t%s",min,max,total/count}')
+| awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){avg=total/count}else{avg=""}; printf "%s\t%s\t%s",min,max,avg}')
 		echo "${GREEN}${STAT_RLT}${RESET}"
 		echo "========================="
 

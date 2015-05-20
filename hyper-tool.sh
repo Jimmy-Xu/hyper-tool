@@ -45,6 +45,7 @@ LEFT_PAD="  "
 
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 LOG_FILE="${BASE_DIR}/log/hyper-tool.log"
+mkdir -p ${BASE_DIR}/log
 touch "${LOG_FILE}"
 
 JQ="jq"
