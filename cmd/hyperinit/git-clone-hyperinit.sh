@@ -3,7 +3,7 @@
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 . ${BASE_DIR}/../common.sh
 
-show_message "clone hyperinit repo" green bold
+show_message "clone hyperinit repo" green
 
 
 if [ ! -d "$GOPATH/src" ]
@@ -19,7 +19,7 @@ TARGET_DIR="$GOPATH/src/${HYPERINIT_CLONE_DIR}"
 if [ -d "${TARGET_DIR}" ]
 then
 	#prompt overwrite or not?
-	echo -e -n "\n${BOLD}${PURPLE}${TARGET_DIR} already exist!${RESET} Will you re-clone the hyperinit repo?(y/N)"
+	echo -e -n "\n${BLUE}${TARGET_DIR} ${BOLD}${PURPLE}already exist!${RESET} Will you re-clone the hyperinit repo?(y/N)"
 	read -n2 CHOICE
 fi
 
@@ -30,11 +30,11 @@ then
 	#remove old dir
 	if [ -d "${TARGET_DIR}" ]
 	then
-		show_message "delete old ${TARGET_DIR}" green bold
+		show_message "delete old repo dir ${BLUE}${TARGET_DIR}${GREEN}" green
 		rm ${TARGET_DIR} -rf
 	fi
 
-	echo -e "> start clone ${YELLOW}<${HYPERINIT_REPO}> ${WHITE}to ${YELLOW}<${TARGET_DIR}>${RESET}\n"
+	show_message "start clone ${BLUE}<${HYPERINIT_REPO}> ${GREEN}to ${BLUE}<${TARGET_DIR}>${RESET}" green
 	echo "--------------------------------------------"
 	git clone ${HYPERINIT_REPO} ${HYPERINIT_CLONE_DIR}
 	echo "--------------------------------------------"
@@ -49,4 +49,4 @@ else
 	show_message "Clone Canceled!" yellow bold
 fi
 
-show_message "Done." green bold
+show_message "Done." green

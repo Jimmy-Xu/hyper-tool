@@ -7,14 +7,14 @@ if [ $# -eq 1 ]
 then
 	if [ "$1" == "-v=3" ]
 	then
-		show_message "starting hyperd with v3" green bold
+		show_message "starting hyperd with v3" green
 		MODE=$1
 	else
 		show_message " [$1] is not invalid parameter, starting hyperd normal" yellow bold
 		MODE=""
 	fi
 else
-	show_message "starting hyperd normal" green bold
+	show_message "starting hyperd normal" green
 	MODE=""
 fi
 
@@ -57,4 +57,4 @@ else
 fi
 
 
-show_message "Done." green bold
+show_message "Done." green

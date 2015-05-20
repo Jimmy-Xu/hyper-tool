@@ -3,7 +3,7 @@
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 . ${BASE_DIR}/../common.sh
 
-show_message "build hyper and hyperd" green bold
+show_message "build hyper and hyperd" green
 
 #check GOROOT and go
 is_go_exist
@@ -20,7 +20,7 @@ FAIL="${RED}fail${RESET}"
 cd "$GOPATH/src/${HYPER_CLONE_DIR}"
 if [ -f hyperd.go -a -f hyper.go ]
 then
-	show_message "[Step 1] build hyper.go" green bold
+	show_message "[Step 1] build hyper.go" green
 	go build hyper.go
 	if [ $? -eq 0 ]
 	then
@@ -29,7 +29,7 @@ then
 		RLT_BLT_HYPER="${FAIL}"
 	fi
 
-	show_message "[Step 2] build hyperd.go" green bold
+	show_message "[Step 2] build hyperd.go" green
 	go build hyperd.go
 	if [ $? -eq 0 ]
 	then
@@ -38,10 +38,10 @@ then
 		RLT_BLT_HYPERD="${FAIL}"
 	fi
 
-	echo -e "\n${BOLD}${YELLOW}Build result:${RESET}"
+	echo -e "\n${BOLD}${PURPLE}Build result:${RESET}"
 	echo "------------------------------"
-	echo "hyper  : ${RLT_BLT_HYPER}"
-	echo "hyperd : ${RLT_BLT_HYPERD}"
+	echo "hyper  : ${BOLD}${RLT_BLT_HYPER}"
+	echo "hyperd : ${BOLD}${RLT_BLT_HYPERD}"
 
 	echo -e "\n${BOLD}${YELLOW}List build result:${RESET}"
 	echo "------------------------------------------------------------"
@@ -51,4 +51,4 @@ then
 
 fi
 
-show_message "Done." green bold
+show_message "Done." green

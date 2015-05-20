@@ -3,7 +3,7 @@
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 . ${BASE_DIR}/../../common.sh
 
-show_message "install docker" green bold
+show_message "install docker" green
 
 OS_DISTRO=$(get_os_distro)
 echo -e "OS_DISTRO : ${OS_DISTRO}\n"
@@ -34,4 +34,4 @@ then
 	fi
 fi
 
-show_message "Done." green bold
+show_message "Done." green

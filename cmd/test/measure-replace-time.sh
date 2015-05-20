@@ -12,7 +12,7 @@ BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 # fi
 
 
-show_message "test pod replace time ${TIME_TYPE}" green bold
+show_message "test pod replace time ${TIME_TYPE}" green
 
 #check hyper dir
 is_hyper_exist
@@ -39,42 +39,45 @@ then
 		LOG_FILE_RUNNING=${LOG_DIR}/pod-running.log
 		LOG_FILE_CREATED=${LOG_DIR}/pod-created.log
 
+		touch ${LOG_FILE}
+		touch ${LOG_FILE_RUNNING}
+		touch ${LOG_FILE_CREATED}
 
 		CNT=$CHOICE
 		#create running pod(s)
 		BEFORE=`sudo ./hyper list pod | grep "pod-.*running" | wc -l`
-		show_message "[Step 1] create ${WHITE}${CHOICE}${GREEN} ${BLUE}running${GREEN} pod(s)..." green bold
+		show_message "[Step 1] create ${WHITE}${CHOICE}${GREEN} ${BLUE}running${GREEN} pod(s)..." green
 		for i in `seq 1 $CNT`
 		 do
 		   echo -n "No. $i "`date +"%F %T" `
 		   START_TS=$(date +'%s')
 		   (time sudo ./hyper pod test/ubuntu.pod) >>"${LOG_FILE_RUNNING}" 2>&1
 		   END_TS=$(date +'%s')
-		   echo "( ${GREEN}$((END_TS-START_TS)) ${RESET}seconds )"
+		   echo "( ${PURPLE}$((END_TS-START_TS)) ${RESET}seconds )"
 		done
 		AFTER=`sudo ./hyper  list pod | grep "pod-.*running" | wc -l`
-		echo "STARTED POD(S)  : ${GREEN}${CNT}${RESET}"
-		echo "ORIG running    : ${GREEN}${BEFORE}${RESET}"
-		echo "CURRENT running : ${GREEN}${AFTER}${RESET}"
+		echo "STARTED POD(S)  : ${PURPLE}${CNT}${RESET}"
+		echo "ORIG running    : ${PURPLE}${BEFORE}${RESET}"
+		echo "CURRENT running : ${PURPLE}${AFTER}${RESET}"
 
 		#create created pod(s)
 		BEFORE=`sudo ./hyper list pod | grep "pod-.*created" | wc -l`
-		show_message "[Step 2] create ${WHITE}${CHOICE}${GREEN} ${YELLOW}created${GREEN} pod(s)..." green bold
+		show_message "[Step 2] create ${WHITE}${CHOICE}${GREEN} ${YELLOW}created${GREEN} pod(s)..." green
 		for i in `seq 1 $CNT`
 		 do
 		   echo -n "No. $i "`date +"%F %T" `
 		   START_TS=$(date +'%s')
 		   (time sudo ./hyper create test/ubuntu.pod) >>"${LOG_FILE_CREATED}" 2>&1
 		   END_TS=$(date +'%s')
-		   echo "( ${GREEN}$((END_TS-START_TS)) ${RESET}seconds )"
+		   echo "( ${PURPLE}$((END_TS-START_TS)) ${RESET}seconds )"
 		done
 		AFTER=`sudo ./hyper  list pod | grep "pod-.*created" | wc -l`
-		echo "CREATED POD(S)  : ${GREEN}${CNT}${RESET}"
-		echo "ORIG created    : ${GREEN}${BEFORE}${RESET}"
-		echo "CURRENT created : ${GREEN}${AFTER}${RESET}"
+		echo "CREATED POD(S)  : ${PURPLE}${CNT}${RESET}"
+		echo "ORIG created    : ${PURPLE}${BEFORE}${RESET}"
+		echo "CURRENT created : ${PURPLE}${AFTER}${RESET}"
 
 		#test replace
-		show_message "[Step 3] tets replace pod(s)..." green bold
+		show_message "[Step 3] tets replace pod(s)..." green
 
 
 		OLD_IFS="$IFS" #save current IFS
@@ -83,15 +86,15 @@ then
 		POD_NEW=($(grep " pod-.*" ${LOG_FILE_CREATED} | awk '{print $4}'))
 		IFS=${OLD_IFS}
 
-		echo "${WHITE}number of old pod(${BLUE}running${WHITE}) ${GREEN}: ${#POD_OLD[@]} ${RESET}"
-		echo "${WHITE}number of new pod(${YELLOW}created${WHITE}) ${GREEN}: ${#POD_NEW[@]} ${RESET}"
+		echo "${WHITE}number of old pod(${BLUE}running${WHITE}) ${PURPLE}: ${#POD_OLD[@]} ${RESET}"
+		echo "${WHITE}number of new pod(${YELLOW}created${WHITE}) ${PURPLE}: ${#POD_NEW[@]} ${RESET}"
 
 		if [ ${#POD_OLD[@]} -eq ${#POD_NEW[@]} ]
 		then
 			#number of old pod is same as new pod
 
 			######################################################
-			show_message "check pod status..." green bold
+			show_message "check pod status..." green
 
 			#echo -e "running pod: \n"${POD_OLD[@]}
 			#echo -e "created pod: \n"${POD_NEW[@]}
@@ -134,21 +137,21 @@ then
 			NUM_CREATED=$(sudo ./hyper list | grep -E "("${POD_NEW_LIST}")" | grep "pod-.*created" | wc -l )
 
 
-			echo "${BOLD}${YELLOW}===================================="
+			echo "${CYAN}===================================="
 			echo "check result:"
 			echo "====================================${RESET}"
-			echo "running pod"
-			echo " >required   : ${GREEN}${#POD_OLD[@]}${RESET}"
-			echo " >real       : ${GREEN}${NUM_RUNNING}${RESET}"
+			echo "${BOLD}running pod${RESET}"
+			echo " >required   : ${PURPLE}${#POD_OLD[@]}${RESET}"
+			echo " >real       : ${PURPLE}${NUM_RUNNING}${RESET}"
 			echo
-			echo "created pod"
-			echo " >required   : ${GREEN}${#POD_NEW[@]}${RESET}"
-			echo " >real       : ${GREEN}${NUM_CREATED}${RESET}"
+			echo "${BOLD}created pod${RESET}"
+			echo " >required   : ${PURPLE}${#POD_NEW[@]}${RESET}"
+			echo " >real       : ${PURPLE}${NUM_CREATED}${RESET}"
 
 			if [ ${#POD_OLD[@]} -eq ${NUM_RUNNING} -a ${#POD_NEW[@]} -eq ${NUM_CREATED} ]
 			then
 				######################################################
-				show_message "start replace..." green bold
+				show_message "start replace..." green
 				for (( i = 0 ; i < ${#POD_OLD[@]} ; i++ ))
 				do
 					echo "$((i+1)): ${PURPLE}sudo ./hyper replace -o ${POD_OLD[$i]} -n ${POD_NEW[$i]} ${RESET}"
@@ -162,7 +165,7 @@ then
 				STAT_RLT=$(grep -A1 "^Successful to replace" "${LOG_FILE}" | grep real | cut -d"m" -f2 | cut -d"s" -f1 \
 				| awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){ printf "%s\t%s\t%s",min*1000,max*1000,total/count*1000}else{print ""}; }')
 
-				echo "${GREEN}${STAT_RLT}${RESET}"
+				echo "${PURPLE}${STAT_RLT}${RESET}"
 				echo "========================="
 
 			else
@@ -180,4 +183,4 @@ then
 fi
 
 
-show_message "Done." green bold
+show_message "Done." green

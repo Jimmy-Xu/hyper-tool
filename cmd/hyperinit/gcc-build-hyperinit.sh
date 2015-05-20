@@ -3,7 +3,7 @@
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 . ${BASE_DIR}/../common.sh
 
-show_message "build hyperinit" green bold
+show_message "build hyperinit" green
 
 #check if hyper already exist
 is_hyperinit_exist
@@ -26,7 +26,7 @@ COMPRESS_OK="${UNEXECUTED}"
 #start execute
 if [ -f ./autogen.sh ]
 then
-	show_message "[Step 1] start auto generate configure and make" green bold
+	show_message "[Step 1] start auto generate configure and make" green
 	./autogen.sh
 	if [ $? -eq 0 ]
 	then
@@ -34,7 +34,7 @@ then
 		AUTOGEN_OK="${SUCCESS}"
 		if [ -f ./configure ]
 		then
-			show_message "[Step 2] start execute ./configure" green bold
+			show_message "[Step 2] start execute ./configure" green
 			./configure
 			if [ $? -eq 0 ]
 			then
@@ -42,12 +42,12 @@ then
 				CONFIGURE_OK="${SUCCESS}"
 				if [ -f ./Makefile ]
 				then
-					show_message "[Step 3] start execute make" green bold
+					show_message "[Step 3] start execute make" green
 					make
 					if [ $? -eq 0 ]
 					then
 						MAKE_OK="${SUCCESS}"
-						show_message "[Step 4] start compress initrd-dvm" green bold
+						show_message "[Step 4] start compress initrd-dvm" green
 						if [ -f src/init -a -d test/root ]
 						then
 							cp src/init test/root/
@@ -93,4 +93,4 @@ ls -l --color test/{kernel,initrd-dvm.img}
 echo
 
 
-show_message "Done." green bold
+show_message "Done." green

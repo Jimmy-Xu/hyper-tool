@@ -3,7 +3,7 @@
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 . ${BASE_DIR}/../common.sh
 
-show_message "install dependency for hyper" green bold
+show_message "install dependency for hyper" green
 
 #check GOROOT and go
 is_go_exist
@@ -19,4 +19,4 @@ then
 	./make_deps.sh
 fi
 
-show_message "Done." green bold
+show_message "Done." green

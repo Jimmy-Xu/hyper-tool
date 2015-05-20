@@ -3,12 +3,12 @@
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 . ${BASE_DIR}/../../common.sh
 
-show_message "add user to docker group" green bold
+show_message "add user to docker group" green
 
 #check if docker is installed
 is_docker_installed
 
-echo -e -n "\n${BOLD}${PURPLE}Please input the ${WHITE}username#{PURPLE} to add to docker group${RESET} (just press 'Enter' to cancel):"
+echo -e -n "\n${BOLD}${PURPLE}Please input the ${WHITE}username${PURPLE} to add to docker group${RESET} (just press 'Enter' to cancel):"
 read CHOICE
 
 if [ ! -z ${CHOICE} ]
@@ -22,10 +22,10 @@ then
 	fi
 fi
 
-echo -e "\n${BOLD}${YELLOW}====================================="
-echo "> all users in docker group"
-echo "=====================================${RESET}"
+echo -e "\n${CYAN}=========================="
+echo "all users in docker group"
+echo "==========================${RESET}"
 grep "^docker"  /etc/group | cut -d":" -f4
 echo
 
-show_message "Done." green bold
+show_message "Done." green

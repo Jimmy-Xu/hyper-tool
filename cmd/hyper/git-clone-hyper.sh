@@ -3,7 +3,7 @@
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 . ${BASE_DIR}/../common.sh
 
-show_message "clone hyper repo" green bold
+show_message "clone hyper repo" green
 
 #check GOPATH
 is_gopath_exist
@@ -18,7 +18,7 @@ cd "$GOPATH/src"
 
 
 #process clone
-TARGET_DIR="$GOPATH/src/${HYPERINIT_CLONE_DIR}"
+TARGET_DIR="$GOPATH/src/${HYPER_CLONE_DIR}"
 if [ -d "${TARGET_DIR}" ]
 then
 	#prompt overwrite or not?
@@ -33,23 +33,23 @@ then
 	#remove old dir
 	if [ -d "${TARGET_DIR}" ]
 	then
-		show_message "delete old ${TARGET_DIR}" green bold
+		show_message "delete old repo dir: ${BLUE}${TARGET_DIR}${GREEN}" green
 		rm ${TARGET_DIR} -rf
 	fi
 
-	echo -e "> start clone ${YELLOW}<${HYPER_REPO}> ${WHITE}to ${YELLOW}<${TARGET_DIR}>${RESET}\n"
+	show_message "start clone ${BLUE}<${HYPER_REPO}> ${WHITE}to ${BLUE}<${TARGET_DIR}>${RESET}" green
 	echo "--------------------------------------------"
 	git clone ${HYPER_REPO} ${HYPER_CLONE_DIR}
-	echo "--------------------------------------------"
 	if [ $? -eq 0 ]
 	then
 		#show local repo info after clone succeed
+		show_message "clone hyper repo succeed!" green bold
 		show_hyper_info
 	else
-		show_message "Clone Failed!" yellow bold
+		show_message "clone hyper repo failed!" red bold
 	fi
 else
-	show_message "Clone Canceled!" yellow bold
+	show_message "clone hyper repo canceled!" yellow bold
 fi
 
-show_message "Done." green bold
+show_message "Done." green

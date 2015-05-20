@@ -112,7 +112,7 @@ function execute_script() {
     if [ "${NEED_CONFIRM}" == "true" ]
     then
       #need confirm before execute script
-      echo -e -n "${LEFT_PAD}${BOLD}${PURPLE}Are you sure to run script [${SCRIPT_FILE}]?${RESET} ('y' to continue, 'Enter' to cancel):"
+      echo -e -n "${LEFT_PAD}${BOLD}${PURPLE}Are you sure to run script [ ${WHITE}${SCRIPT_FILE}${PURPLE} ]?${RESET} ('y' to continue, 'Enter' to cancel):"
       read CHOICE
     fi
 
@@ -120,7 +120,7 @@ function execute_script() {
     then
       #need confirm, but doesn't input "y"
       echo "${LEFT_PAD}======================================================================="
-      echo "${LEFT_PAD}${CYAN}Cancel run shell script [${SCRIPT_FILE}] ${RESET}"
+      echo "${LEFT_PAD}${CYAN}Cancel run shell script [ ${WHITE}${SCRIPT_FILE} ${CYAN} ] ${RESET}"
       echo -e "${LEFT_PAD}=======================================================================\n"
       #mainMe;
       sleep 1

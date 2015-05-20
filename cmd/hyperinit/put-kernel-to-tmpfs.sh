@@ -3,7 +3,7 @@
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 . ${BASE_DIR}/../common.sh
 
-show_message "put kernel to tmpfs" green bold
+show_message "put kernel to tmpfs" green
 
 echo
 echo "[Source] : ${PURPLE}$GOPATH/src/${HYPERINIT_CLONE_DIR}/test/{kernel,initrd-dvm.img}${RESET}"
@@ -16,7 +16,7 @@ then
 	if [ ! -d "${HYPER_KERNEL_DIR}" ]
 	then
 		#create HYPER_KERNEL_DIR if not exist
-		show_message "creating ${HYPER_KERNEL_DIR}" green bold
+		show_message "creating ${HYPER_KERNEL_DIR}" green
 		sudo mkdir -p ${HYPER_KERNEL_DIR}
 		if [ $? -ne 0 ]
 		then
@@ -28,12 +28,12 @@ then
 	fi
 
 	#HYPER_KERNEL_DIR existed
-	show_message "copying kernel and initrd-dvm.img to tmpfs[${HYPER_KERNEL_DIR}]" green bold
+	show_message "copying kernel and initrd-dvm.img to tmpfs[${HYPER_KERNEL_DIR}]" green
 	sudo cp "$GOPATH/src/${HYPERINIT_CLONE_DIR}"/test/{kernel,initrd-dvm.img} "${HYPER_KERNEL_DIR}"
 
 	if [ -d "${BASE_DIR}/../../kernel" ]
 	then
-		show_message "copying minified kernel to tmpfs[${HYPER_KERNEL_DIR}]" green bold
+		show_message "copying minified kernel to tmpfs[${HYPER_KERNEL_DIR}]" green
 		sudo cp ${BASE_DIR}/../../kernel/kernel* "${HYPER_KERNEL_DIR}"
 	fi
 
@@ -48,4 +48,4 @@ else
 fi
 
 
-show_message "Done." green bold
+show_message "Done." green

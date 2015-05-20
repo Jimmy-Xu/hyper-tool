@@ -26,7 +26,7 @@ then
 fi
 
 
-show_message "start list '${LIST_OBJ}'" green bold
+show_message "list '${LIST_OBJ}'" green
 
 #check hyper dir
 is_hyper_exist
@@ -34,9 +34,9 @@ is_hyper_exist
 
 cd "$GOPATH/src/${HYPER_CLONE_DIR}"
 echo -e "\nrun command line: [ ${BOLD}${PURPLE}sudo ./hyper list ${LIST_OBJ} ${RESET} ]"
-echo -e "\n${BOLD}${YELLOW}===================================================="
-echo " Here are all ${WHITE}${LIST_OBJ}${YELLOW}(s):"
+echo -e "\n${BOLD}${CYAN}===================================================="
+echo " Here are all ${WHITE}${LIST_OBJ}${CYAN}(s):"
 echo "====================================================${RESET}"
 sudo ./hyper list ${LIST_OBJ}
 
-show_message "Done." green bold
+show_message "Done." green

@@ -86,26 +86,42 @@ function show_repo_info() {
 	if [ -d "${TARGET_DIR}" ]
 	then
 		cd "${TARGET_DIR}"
-		REPO_URL=$(git config --list | grep "remote.origin.url" | cut -d"=" -f2)
 
-		echo "${BOLD}${YELLOW}#####################################################"
-		echo " remote repo url: [ ${PURPLE}${REPO_URL}${YELLOW} ]"
-		echo " local repo info: [ ${PURPLE}${TARGET_DIR}${YELLOW} ]"
-		echo "#####################################################${RESET}"
 
-		echo -e "\n${BOLD}${YELLOW}------------------- list files -------------------${RESET}"
+		show_message "show repo info in ${BLUE}${TARGET_DIR}${RESET}" green
+
+		echo -e "\n${BOLD}${CYAN}------------------- list files -------------------${RESET}"
 		ls -l --color
 
-		echo -e "\n${BOLD}${YELLOW}----------------- list branches ------------------${RESET}"
+		echo -e "\n${BOLD}${CYAN}----------------- list branches ------------------${RESET}"
 		git branch -a
 
-		echo -e "\n${BOLD}${YELLOW}------------------- list tags --------------------${RESET}"
+		echo -e "\n${BOLD}${CYAN}------------------- list tags --------------------${RESET}"
 		git tag --list
 
-		echo -e "\n${BOLD}${YELLOW}------------------ show status -------------------${RESET}"
+		echo -e "\n${BOLD}${CYAN}------------------ show status -------------------${RESET}"
 		git status
 
-		echo -e "\n${BOLD}${YELLOW}==================================================${RESET}"
+		echo -e "\n${BOLD}${CYAN}-------------------- git lg ----------------------${RESET}"
+		#ensure local alias.lg
+		git config --list | grep "alias.log" > /dev/null || git config alias.lg "log --graph --pretty=format:'[%ci] %Cgreen(%cr) %Cred%h%Creset -%x09%C(yellow)%Creset %C(cyan)[%an]%Creset %x09 %s %Cgreen(%cr)%Creset' --abbrev-commit --date=short"
+		#show git log
+		LOG_LEN=$(git lg --since=yesterday | wc -l)
+		if [ ${LOG_LEN} -eq 0 ]
+		then
+			git lg | head -n 20
+		else
+			git lg --after="yesterday" | head -n 20
+		fi
+		echo -e "\n..."
+
+		echo -e "${BOLD}${CYAN}====================================================================================================${RESET}"
+
+		REPO_URL=$(git config --list | grep "remote.origin.url" | cut -d"=" -f2)
+		echo "${WHITE}#######################################################"
+		echo " remote repo url: [ ${PURPLE}${REPO_URL}${WHITE} ]"
+		echo " local repo info: [ ${PURPLE}${TARGET_DIR}${WHITE} ]"
+		echo "#######################################################${RESET}"
 	fi
 }
 
@@ -148,7 +164,7 @@ function is_docker_installed() {
 	INST_DOCKER=$(which docker 2>/dev/null)
 	if [ $? -eq 0 ]
 	then
-		show_message "Docker version:" purple bold
+		show_message "Docker version:" purple
 		sudo docker --version
 	else
 		show_message "docker hasn't been installed, please install docker first." yellow bold
@@ -163,7 +179,7 @@ function is_golang_installed() {
 	INST_GO=$(which go 2>/dev/null)
 	if [ $? -eq 0 ]
 	then
-		show_message "go version:" purple bold
+		show_message "go version:" purple
 		go version
 	else
 		show_message "golang hasn't been installed, please install golang first." yellow bold
@@ -178,7 +194,7 @@ function is_qemu_installed() {
 	INST_QEMU=$(which qemu-system-x86_64 2>/dev/null)
 	if [ $? -eq 0 ]
 	then
-		show_message "qemu version:" purple bold
+		show_message "qemu version:" purple
 		qemu-system-x86_64 --version
 	else
 		show_message "qemu hasn't been installed, please install qemu first." yellow bold
@@ -192,7 +208,7 @@ function is_hyperd_running() {
 	HYPERD_CNT=$(ps -aux | grep "sudo ./hyperd" | grep -v grep | wc -l)
 	if [ "${HYPERD_CNT}" -eq 1 ]
 	then
-		show_message "hyperd is running:)" green bold
+		show_message "hyperd is running:)" green
 	else
 		show_message "hyperd isn't running:(" red bold
 		exit 1
