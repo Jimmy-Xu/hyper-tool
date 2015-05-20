@@ -5,12 +5,14 @@ BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 
 show_message "test pod startup time" green bold
 
-
-cd "${GOPATH}/src/${HYPER_CLONE_DIR}"
+#check hyper dir
+is_hyper_exist
 
 #check hyperd process
 is_hyperd_running
 
+
+cd "${GOPATH}/src/${HYPER_CLONE_DIR}"
 sudo echo
 
 echo -e "${BOLD}${YELLOW}===================================================="

@@ -3,6 +3,13 @@
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 . ${BASE_DIR}/../../common.sh
 
+#check hyper dir
+is_hyper_exist
+
+#check hyperd process
+is_hyperd_running
+
+
 LIST_OBJ="pod"
 if [ $# -eq 1 ]
 then

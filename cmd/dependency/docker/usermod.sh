@@ -8,7 +8,7 @@ show_message "add user to docker group" green bold
 #check if docker is installed
 is_docker_installed
 
-echo -e -n "\n${BOLD}${PURPLE}Please input the username to add to docker group${RESET} (just press 'Enter' to cancel):"
+echo -e -n "\n${BOLD}${PURPLE}Please input the ${WHITE}username#{PURPLE} to add to docker group${RESET} (just press 'Enter' to cancel):"
 read CHOICE
 
 if [ ! -z ${CHOICE} ]

@@ -8,6 +8,9 @@ show_message "start pod" green bold
 #check hyper dir
 is_hyper_exist
 
+#check hyperd process
+is_hyperd_running
+
 cd "$GOPATH/src/${HYPER_CLONE_DIR}"
 
 show_message "list test pod" green bold
@@ -17,7 +20,7 @@ echo "====================================================${RESET}"
 ls -l --color test/*.pod
 
 
-echo -e -n "\n${BOLD}${PURPLE}Please input the pod filename${RESET}(example: ubuntu, or press 'Enter' to cancel):"
+echo -e -n "\n${BOLD}${PURPLE}Please input the ${WHITE}pod json filename${PURPLE}${RESET}(example: ${YELLOW}ubuntu${RESET}, or press 'Enter' to cancel):"
 read CHOICE
 
 if [ ! -z ${CHOICE} ]

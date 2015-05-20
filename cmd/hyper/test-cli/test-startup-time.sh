@@ -5,8 +5,14 @@ BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 
 show_message "test pod startup time" green bold
 
+#check hyper dir
+is_hyper_exist
 
-echo -e -n "\n${BOLD}${PURPLE}Please input the number of pod(s)${RESET}(press 'Enter' to cancel):"
+#check hyperd process
+is_hyperd_running
+
+
+echo -e -n "\n${BOLD}${PURPLE}Please input the ${WHITE}number${PURPLE} of pod(s)${RESET}(press 'Enter' to cancel):"
 read CHOICE
 
 if [ ! -z ${CHOICE} ]
@@ -21,8 +27,8 @@ then
 		cd "${GOPATH}/src/${HYPER_CLONE_DIR}"
 		if [ -f "${LOG_FILE}" ]
 		then
+			show_message "delete old log [ ${LOG_FILE} ]" yellow bold
 			\rm -rf "${LOG_FILE}"
-			show_message "old ${LOG_FILE} deleted" yellow bold
 		fi
 
 		BEFORE=`sudo ./hyper list pod | grep running | wc -l`
