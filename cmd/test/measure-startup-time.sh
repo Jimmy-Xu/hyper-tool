@@ -66,7 +66,7 @@ then
 		echo "ORIG running    : ${PURPLE}${BEFORE}${RESET}"
 		echo "CURRENT running : ${PURPLE}${AFTER}${RESET}"
 
-		show_message "startup time stat (ms):" yellow bold
+		show_message "startup time stat result (ms):" yellow bold
 		echo "========================="
 		echo -e "min\tmax\tavg"
 		echo "-------------------------"

@@ -82,8 +82,8 @@ then
 
 		OLD_IFS="$IFS" #save current IFS
 		IFS=$'\x0A' #enter key
-		POD_OLD=($(grep " pod-.*" ${LOG_FILE_RUNNING} | awk '{print $4}'))
-		POD_NEW=($(grep " pod-.*" ${LOG_FILE_CREATED} | awk '{print $4}'))
+		POD_OLD=($(grep " pod-.*" ${LOG_FILE_RUNNING} | awk '{print $4}' | sort ))
+		POD_NEW=($(grep " pod-.*" ${LOG_FILE_CREATED} | awk '{print $4}' | sort ))
 		IFS=${OLD_IFS}
 
 		echo "${WHITE}number of old pod(${BLUE}running${WHITE}) ${PURPLE}: ${#POD_OLD[@]} ${RESET}"
@@ -124,16 +124,18 @@ then
 			#echo -e "running pod: \n"${POD_OLD_LIST}
 			#echo -e "created pod: \n"${POD_NEW_LIST}
 
+			show_message "show pod status before replace" green bold
+
 			echo "${BOLD}${WHITE}===================================="
 			echo "old pod status(${GREEN}running${YELLOW}${WHITE}):"
 			echo "====================================${RESET}"
-			sudo ./hyper list | grep -E "("${POD_OLD_LIST}")" | grep -n -E "(running|created)" --color
+			sudo ./hyper list | sort | grep -E "("${POD_OLD_LIST}")" | grep -n -E "(running|created)" --color
 			NUM_RUNNING=$(sudo ./hyper list | grep -E "("${POD_OLD_LIST}")" | grep "pod-.*running" | wc -l )
 
 			echo "${BOLD}${WHITE}===================================="
 			echo "new pod status(${YELLOW}created${YELLOW}${WHITE}):"
 			echo "====================================${RESET}"
-			sudo ./hyper list | grep -E "("${POD_NEW_LIST}")" | grep -n -E "(running|created)" --color
+			sudo ./hyper list | sort | grep -E "("${POD_NEW_LIST}")" | grep -n -E "(running|created)" --color
 			NUM_CREATED=$(sudo ./hyper list | grep -E "("${POD_NEW_LIST}")" | grep "pod-.*created" | wc -l )
 
 
@@ -158,7 +160,21 @@ then
 					( time sudo ./hyper replace -o ${POD_OLD[$i]} -n ${POD_NEW[$i]} ) >>"${LOG_FILE}" 2>&1
 				done
 
-				show_message "replace time stat (ms):" yellow bold
+
+				show_message "show pod status after replace" green bold
+
+				echo "${BOLD}${WHITE}===================================="
+				echo "old pod status(${GREEN}running${YELLOW}${WHITE}):"
+				echo "====================================${RESET}"
+				sudo ./hyper list | sort | grep -E "("${POD_OLD_LIST}")" | grep -n -E "(running|created)" --color
+
+				echo "${BOLD}${WHITE}===================================="
+				echo "new pod status(${YELLOW}created${YELLOW}${WHITE}):"
+				echo "====================================${RESET}"
+				sudo ./hyper list | sort | grep -E "("${POD_NEW_LIST}")" | grep -n -E "(running|created)" --color
+
+
+				show_message "replace time stat result (ms):" yellow bold
 				echo "========================="
 				echo -e "min\tmax\tavg"
 				echo "-------------------------"
@@ -167,6 +183,8 @@ then
 
 				echo "${PURPLE}${STAT_RLT}${RESET}"
 				echo "========================="
+
+
 
 			else
 				show_message "number of running pod is different with created pod, can not replace" red bold
