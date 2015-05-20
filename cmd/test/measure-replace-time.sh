@@ -35,13 +35,21 @@ then
 		#ensure log dir
 		mkdir -p ${LOG_DIR}
 
+		#create logfile
 		LOG_FILE=${LOG_DIR}/time-replace.log
 		LOG_FILE_RUNNING=${LOG_DIR}/pod-running.log
 		LOG_FILE_CREATED=${LOG_DIR}/pod-created.log
-
 		touch ${LOG_FILE}
 		touch ${LOG_FILE_RUNNING}
 		touch ${LOG_FILE_CREATED}
+
+		#create link
+		LINK_CURRENT=${BASE_DIR}/../../log/replace/current
+		if [ -d ${LINK_CURRENT} ]
+		then
+			rm ${LINK_CURRENT}
+		fi
+		ln -s ${LOG_DIR} ${LINK_CURRENT}
 
 		CNT=$CHOICE
 		#create running pod(s)
