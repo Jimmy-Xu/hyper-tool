@@ -27,28 +27,28 @@ sudo ./hyper list pod | grep "pod-.*created" | awk '{print $1}' | xargs -i sudo 
 sleep 1
 show_message "kill qemu" green
 sudo pkill qemu
-
+sleep 1
 
 echo -e "\n${BOLD}${CYAN}===================================================="
 echo " check evn again :"
 echo "====================================================${RESET}"
 
-echo -e -n "${BOLD}${WHITE} container(s)     : ${RESET}${PURPLE}"
+echo -e -n "${BOLD}${WHITE} containers     : ${RESET}${PURPLE}"
 sudo ./hyper list container | grep online | wc -l
 
-echo -e -n "${BOLD}${WHITE} running pod(s)   : ${RESET}${PURPLE}"
+echo -e -n "${BOLD}${WHITE} running pods   : ${RESET}${PURPLE}"
 sudo ./hyper list | grep "pod-.*running" | grep -v ERROR | wc -l
 
-echo -e -n "${BOLD}${WHITE} stopped pod(s)   : ${RESET}${PURPLE}"
+echo -e -n "${BOLD}${WHITE} stopped pods   : ${RESET}${PURPLE}"
 sudo ./hyper list | grep "pod-.*created" | wc -l
 
-echo -e -n "${BOLD}${WHITE} all pod(s)       : ${RESET}${PURPLE}"
+echo -e -n "${BOLD}${WHITE} all pods       : ${RESET}${PURPLE}"
 sudo ./hyper list | grep "pod-" | wc -l
 
-echo -e -n "${BOLD}${WHITE} qemu process(es) : ${RESET}${PURPLE}"
+echo -e -n "${BOLD}${WHITE} qemu processes : ${RESET}${PURPLE}"
 sudo pgrep qemu | wc -l
 
-echo -e -n "${BOLD}${WHITE} tap device(s)    : ${RESET}${PURPLE}"
+echo -e -n "${BOLD}${WHITE} tap devices    : ${RESET}${PURPLE}"
 sudo ifconfig | grep "^tap" | wc -l
 
 echo "${RESET}"
