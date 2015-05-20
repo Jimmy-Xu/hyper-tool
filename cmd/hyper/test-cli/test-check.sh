@@ -11,6 +11,7 @@ cd "${GOPATH}/src/${HYPER_CLONE_DIR}"
 #check hyperd process
 is_hyperd_running
 
+sudo echo
 
 echo -e "${BOLD}${YELLOW}===================================================="
 echo " check result :"

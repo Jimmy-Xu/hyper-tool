@@ -174,7 +174,7 @@ function is_golang_installed() {
 
 #check if hyper is cloned to local
 function is_hyperd_running() {
-	HYPERD_CNT=$(pgrep hyperd | wc -l)
+	HYPERD_CNT=$(ps -aux | grep "sudo ./hyperd" | grep -v grep | wc -l)
 	if [ "${HYPERD_CNT}" -eq 1 ]
 	then
 		show_message "hyperd is running:)" green bold
