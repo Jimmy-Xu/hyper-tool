@@ -20,7 +20,7 @@ echo "====================================================${RESET}"
 sudo ./hyper list pod
 
 
-echo -e -n "\n${BOLD}${PURPLE}Please input the ${WHITE}pod id${PURPLE}${RESET}('${YELLOW}$${RESET}' for all, press 'Enter' to cancel):"
+echo -e -n "\n${BOLD}${PURPLE}Please input the ${WHITE}pod id${PURPLE}${RESET}('$' for all, press 'Enter' to cancel):"
 read CHOICE
 
 if [ ! -z ${CHOICE} ]
@@ -29,7 +29,7 @@ then
 	if [ "${CHOICE}" == "$" ]
 	then
 		show_message "stop all running pod" green bold
-		sudo ./hyper list pod | grep "running" | awk '{print $1}' | xargs -i sudo ./hyper stop pod {}
+		sudo ./hyper list pod | grep "pod-.*running" | awk '{print $1}' | xargs -i sudo ./hyper stop pod {}
 	else
 		show_message "stop single pod [ ${CHOICE} ]" green bold
 		sudo ./hyper stop pod ${CHOICE}

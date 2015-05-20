@@ -30,7 +30,7 @@ then
 	if [ "${CHOICE}" == "$" ]
 	then
 		show_message "remove all created pod" green bold
-		sudo ./hyper list | grep "created" | awk '{print $1}' | xargs -i sudo ./hyper rm {}
+		sudo ./hyper list | grep "pod-.*created" | awk '{print $1}' | xargs -i sudo ./hyper rm {}
 	else
 		show_message "remove single pod [ ${CHOICE} ]" green bold
 		sudo ./hyper pod ${CHOICE}
