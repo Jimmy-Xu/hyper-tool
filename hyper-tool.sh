@@ -101,6 +101,13 @@ function execute_script() {
 
   if [ -f ./cmd/"${FILENAME}" ]
   then
+
+    #check file mod
+    if [ ! -x ./cmd/"${FILENAME}" ]
+    then
+      chmod +x ./cmd/"${FILENAME}"
+    fi
+
     echo
     if [ "${NEED_CONFIRM}" == "true" ]
     then
