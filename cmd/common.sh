@@ -158,15 +158,30 @@ function is_docker_installed() {
 }
 
 
-#check if hyper is cloned to local
+#check if golang is installed
 function is_golang_installed() {
-	INST_DOCKER=$(which go 2>/dev/null)
+	INST_GO=$(which go 2>/dev/null)
 	if [ $? -eq 0 ]
 	then
 		show_message "go version:" purple bold
 		go version
 	else
 		show_message "golang hasn't been installed, please install golang first." yellow bold
+		exit 1
+	fi
+
+}
+
+
+#check if qemu is installed
+function is_qemu_installed() {
+	INST_QEMU=$(which qemu-system-x86_64 2>/dev/null)
+	if [ $? -eq 0 ]
+	then
+		show_message "qemu version:" purple bold
+		qemu-system-x86_64 --version
+	else
+		show_message "qemu hasn't been installed, please install qemu first." yellow bold
 		exit 1
 	fi
 
