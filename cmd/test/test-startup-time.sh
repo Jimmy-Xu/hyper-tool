@@ -42,7 +42,7 @@ then
 			\rm -rf "${LOG_FILE}"
 		fi
 
-		BEFORE=`sudo ./hyper list pod | grep running | wc -l`
+		BEFORE=`sudo ./hyper list pod | grep "pod-.*running" | wc -l`
 
 		show_message "start create ${WHITE}${CHOICE}${GREEN} pod(s)..." green bold
 		for i in `seq 1 $CNT`
@@ -54,7 +54,7 @@ then
 		  echo "( ${GREEN}$((END_TS-START_TS)) ${RESET}seconds )"
 		done
 
-		AFTER=`sudo ./hyper  list pod | grep running | wc -l`
+		AFTER=`sudo ./hyper  list pod | grep "pod-.*running" | wc -l`
 
 		echo
 		echo "CREATED POD(S)  : ${GREEN}${CNT}${RESET}"

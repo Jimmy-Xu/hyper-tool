@@ -23,13 +23,13 @@ echo -e -n "${BOLD}${WHITE} container(s)     : ${RESET}${PURPLE}"
 sudo ./hyper list container | grep online | wc -l
 
 echo -e -n "${BOLD}${WHITE} running pod(s)   : ${RESET}${PURPLE}"
-sudo ./hyper list | grep running | grep -v ERROR | wc -l
+sudo ./hyper list | grep "pod-.*running" | grep -v ERROR | wc -l
 
 echo -e -n "${BOLD}${WHITE} stopped pod(s)   : ${RESET}${PURPLE}"
-sudo ./hyper list | grep created | wc -l
+sudo ./hyper list | grep "pod-.*created" | wc -l
 
 echo -e -n "${BOLD}${WHITE} all pod(s)       : ${RESET}${PURPLE}"
-sudo ./hyper list | grep "pod-" | wc -l
+sudo ./hyper list | grep "pod-.*" | wc -l
 
 echo -e -n "${BOLD}${WHITE} qemu process(es) : ${RESET}${PURPLE}"
 sudo pgrep qemu | wc -l
