@@ -30,14 +30,14 @@ then
 	then
 		cd "${GOPATH}/src/${HYPER_CLONE_DIR}"
 
-		LOG_DIR=${BASE_DIR}/../../log/replace
+		LOG_TS=$(date +'%s')
+		LOG_DIR=${BASE_DIR}/../../log/replace/${LOG_TS}
 		#ensure log dir
 		mkdir -p ${LOG_DIR}
 
-		LOG_TS=$(date +'%s')
-		LOG_FILE=${LOG_DIR}/time-replace-${LOG_TS}.log
-		LOG_FILE_RUNNING=${LOG_DIR}/pod-running-${LOG_TS}.log
-		LOG_FILE_CREATED=${LOG_DIR}/pod-created-${LOG_TS}.log
+		LOG_FILE=${LOG_DIR}/time-replace.log
+		LOG_FILE_RUNNING=${LOG_DIR}/pod-running.log
+		LOG_FILE_CREATED=${LOG_DIR}/pod-created.log
 
 
 		CNT=$CHOICE
@@ -89,8 +89,57 @@ then
 		if [ ${#POD_OLD[@]} -eq ${#POD_NEW[@]} ]
 		then
 			#number of old pod is same as new pod
-			show_message "start replace..." green bold
 
+			######################################################
+			show_message "check pod status..." green bold
+
+			#echo -e "running pod: \n"${POD_OLD[@]}
+			#echo -e "created pod: \n"${POD_NEW[@]}
+
+			#generate POD_OLD_LIST
+			for (( i = 0 ; i < ${#POD_OLD[@]} ; i++ ))
+			do
+				if [ $i -eq 0 ]
+				then
+					POD_OLD_LIST=${POD_OLD[$i]}
+				else
+					POD_OLD_LIST+="|${POD_OLD[$i]}"
+				fi
+			done
+
+			#generate POD_NEW_LIST
+			for (( i = 0 ; i < ${#POD_NEW[@]} ; i++ ))
+			do
+				if [ $i -eq 0 ]
+				then
+					POD_NEW_LIST=${POD_NEW[$i]}
+				else
+					POD_NEW_LIST+="|${POD_NEW[$i]}"
+				fi
+			done
+
+			#echo -e "running pod: \n"${POD_OLD_LIST}
+			#echo -e "created pod: \n"${POD_NEW_LIST}
+
+			echo "${BOLD}${WHITE}===================================="
+			echo "old pod status(${GREEN}running${YELLOW}${WHITE}):"
+			echo "====================================${RESET}"
+			sudo ./hyper list | grep -E "("${POD_OLD_LIST}")" | grep -n -E "(running|created)" --color
+
+			echo "${BOLD}${WHITE}===================================="
+			echo "new pod status(${YELLOW}created${YELLOW}${WHITE}):"
+			echo "====================================${RESET}"
+			sudo ./hyper list | grep -E "("${POD_NEW_LIST}")" | grep -n -E "(running|created)" --color
+
+
+
+			######################################################
+			show_message "start replace..." green bold
+			for (( i = 0 ; i < ${#POD_OLD[@]} ; i++ ))
+			do
+				echo "$((i+1)): ${PURPLE}sudo ./hyper replace -o ${POD_OLD[$i]} -n ${POD_NEW[$i]} ${RESET}"
+				( time sudo ./hyper replace -o ${POD_OLD[$i]} -n ${POD_NEW[$i]} ) >>"${LOG_FILE}" 2>&1
+			done
 		else
 			show_message "number of old pod is different with new pod, can not replace" red bold
 		fi
