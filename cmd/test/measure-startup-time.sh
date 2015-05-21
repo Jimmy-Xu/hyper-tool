@@ -77,7 +77,16 @@ then
 		echo "ORIG running    : ${PURPLE}${BEFORE}${RESET}"
 		echo "CURRENT running : ${PURPLE}${AFTER}${RESET}"
 
-		show_message "startup time stat result (ms):" yellow bold
+		if [ ${CNT} -ne $((AFTER-BEFORE)) ]
+		then
+			show_message "require ${WHITE}${CNT}${RESET} pods running, but now has ${WHITE}$((AFTER-BEFORE))${RESET} pods running " red bold
+			echo "----------------------------"
+			echo "error message in log:"
+			echo "----------------------------"
+			grep -i --color -n "ERROR" ${LINK_CURRENT}
+		fi
+
+		show_message "startup time stat result (ms): ${WHITE}[ include ${PURPLE}$((AFTER-BEFORE))${RESET} running pods ] " yellow bold
 		echo "========================="
 		echo -e "min\tmax\tavg"
 		echo "-------------------------"
@@ -98,6 +107,7 @@ then
 		echo "${CYAN}${TIME_TYPE}${RESET}"
 
 		echo -e "\nlog file: [ ${BLUE} ${LINK_CURRENT} ${RESET}]"
+
 
 	else
 		show_message "please input a number, [ $CHOICE ] isn't a valid number(>=1)" red bold
