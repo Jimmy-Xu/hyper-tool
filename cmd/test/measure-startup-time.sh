@@ -34,10 +34,20 @@ then
 	then
 		CNT=$CHOICE
 
-		LOG_DIR=${BASE_DIR}/../../log/startup/
+		LOG_DIR=${BASE_DIR}/../../log/startup
 		LOG_FILE=${LOG_DIR}/time-startup-$(date +'%s').log
 		#ensure log dir
 		mkdir -p ${LOG_DIR}
+
+		#create link
+		LINK_CURRENT=${LOG_DIR}/current
+		if [ -d ${LINK_CURRENT} ]
+		then
+			rm ${LINK_CURRENT}
+		fi
+		ln -s ${LOG_FILE} ${LINK_CURRENT}
+
+
 
 		cd "${GOPATH}/src/${HYPER_CLONE_DIR}"
 		if [ -f "${LOG_FILE}" ]

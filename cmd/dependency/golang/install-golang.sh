@@ -57,7 +57,7 @@ then
 		show_message "install golang failed:(" red bold
 	fi
 else
-	show_message -e "please set GOROOT env first!" yellow bold
+	show_message "please set GOROOT env first!" yellow bold
 fi
 
 show_message "Done." green
