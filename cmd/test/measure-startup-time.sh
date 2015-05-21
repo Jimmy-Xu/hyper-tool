@@ -41,8 +41,9 @@ then
 
 		#create link
 		LINK_CURRENT=${LOG_DIR}/current
-		if [ -d ${LINK_CURRENT} ]
+		if [ -f ${LINK_CURRENT} ]
 		then
+			show_message "log link exist, will remove it first" yellow bold
 			rm ${LINK_CURRENT}
 		fi
 		ln -s ${LOG_FILE} ${LINK_CURRENT}
@@ -95,6 +96,8 @@ then
 		echo "${PURPLE}${STAT_RLT}${RESET}"
 		echo "========================="
 		echo "${CYAN}${TIME_TYPE}${RESET}"
+
+		echo -e "\nlog file: [ ${BLUE} ${LINK_CURRENT} ${RESET}]"
 
 	else
 		show_message "please input a number, [ $CHOICE ] isn't a valid number(>=1)" red bold

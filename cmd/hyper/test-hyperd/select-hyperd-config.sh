@@ -35,7 +35,7 @@ then
 		LINK_CURRENT=${CONFIG_DIR}/config
 		if [ -f ${LINK_CURRENT} ]
 		then
-			show_message "link exist, remove it first" yellow bold
+			show_message "link exist, will remove it first" yellow bold
 			rm ${LINK_CURRENT} -rf
 		fi
 		ln -s ${SEL_CONFIG} ${LINK_CURRENT}

@@ -47,6 +47,7 @@ then
 		LINK_CURRENT=${BASE_DIR}/../../log/replace/current
 		if [ -d ${LINK_CURRENT} ]
 		then
+			show_message "log dir link exist, will remove it first" yellow bold
 			rm ${LINK_CURRENT}
 		fi
 		ln -s ${LOG_DIR} ${LINK_CURRENT}
@@ -193,6 +194,7 @@ then
 				echo "========================="
 
 
+				echo -e "\nlog dir: [ ${BLUE} ${LOG_DIR} ${RESET}]"
 
 			else
 				show_message "number of running pod is different with created pod, can not replace" red bold
