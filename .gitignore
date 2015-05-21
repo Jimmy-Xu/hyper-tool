@@ -2,3 +2,4 @@
 *.html
 kernel/
 log/
+etc/config
