@@ -6,7 +6,7 @@ BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 
 show_message "view memory usage" green
 
-
+#QEMU process memory usage
 #number of  qemu process
 NUM_QEMU_PROC=$(ps aux | sed -n '1p;/'${QEMU_PROCESS}'/p' | grep -v sed| grep qemu | wc -l)
 
@@ -24,5 +24,62 @@ STAT_RLT_VSZ=$(ps aux | sed -n '1p;/'${QEMU_PROCESS}'/p' | grep -v sed | awk '{p
 echo "VSZ(VmSize): ${PURPLE}${STAT_RLT_VSZ}${RESET}"
 echo "==========================================="
 
+
+#memory usage in container
+LOG_TS=$(date +'%s')
+LOG_DIR=${BASE_DIR}/../../log/memory/${LOG_TS}
+#ensure log dir
+mkdir -p ${LOG_DIR}
+
+#create logfile
+LOG_FILE=${LOG_DIR}/memory-in-container.log
+touch ${LOG_FILE}
+
+#create link
+LINK_CURRENT=${BASE_DIR}/../../log/memory/current
+if [ -d ${LINK_CURRENT} ]
+then
+	show_message "log dir link exist, will remove it first" yellow bold
+	rm ${LINK_CURRENT}
+fi
+ln -s ${LOG_DIR} ${LINK_CURRENT}
+
+
+cd ${LINK_CURRENT}
+if [ -d ${LINK_CURRENT} ]
+then
+	HYPER_CLI="${GOPATH}/src/${HYPER_CLONE_DIR}/hyper"
+	show_message "${GREEN}Entering dir ${BLUE}${LINK_CURRENT}${GREEN}, hyper client path ${HYPER_CLI}" grep bold
+
+	cd ${LINK_CURRENT}
+	sudo echo
+	rm -rf view-container-mem.sh
+	sudo ${HYPER_CLI} list container | grep online | awk -v hyper=${HYPER_CLI} '{printf "sudo "hyper" exec %s top -b -n1 \n",$1}' >> view-container-mem.sh
+	chmod u+x view-container-mem.sh && ./view-container-mem.sh > ./container-mem.log 2>&1
+
+	if [ $? -eq 0 ]
+	then
+		STAT_RLT_TOTAL=$(grep "^KiB Mem" container-mem.log | awk '{print $3}' | awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){ printf "%5.0f\t%5.0f\t%5.0f",min/1024,max/1024,total/count/1024}else{print ""}; }')
+		STAT_RLT_USED=$( grep "^KiB Mem" container-mem.log | awk '{print $5}' | awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){ printf "%5.0f\t%5.0f\t%5.0f",min/1024,max/1024,total/count/1024}else{print ""}; }')
+		STAT_RLT_FREE=$( grep "^KiB Mem" container-mem.log | awk '{print $7}' | awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){ printf "%5.0f\t%5.0f\t%5.0f",min/1024,max/1024,total/count/1024}else{print ""}; }')
+
+		echo "==========================================="
+		echo -e "         min      max     avg"
+		echo "==========================================="
+		echo "Total: ${PURPLE}${STAT_RLT_TOTAL}${RESET}"
+		echo "-------------------------------------------"
+		echo "Used : ${PURPLE}${STAT_RLT_USED}${RESET}"
+		echo "-------------------------------------------"
+		echo "Free : ${PURPLE}${STAT_RLT_FREE}${RESET}"
+		echo "==========================================="
+	else
+		show_message "stat memory usage in container failed:(" red bold
+		cat ./container-mem.log
+	fi
+
+	show_message "log dir: [ ${BLUE}${LINK_CURRENT}${GREEN} ]" green bold
+else
+	show_message "${LINK_CURRENT} isn't exist, cancel"
+fi
 
 show_message "Done." green
