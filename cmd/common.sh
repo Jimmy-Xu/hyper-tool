@@ -22,6 +22,8 @@ GOLANG_URL=https://storage.googleapis.com/golang/${GOLANG}.tar.gz
 #kernel in tmpfs
 HYPER_KERNEL_DIR=/run/hyper-kernel
 
+QEMU_PROCESS=qemu-system-x86_64
+
 ###################################################
 # function
 ###################################################
@@ -191,11 +193,11 @@ function is_golang_installed() {
 
 #check if qemu is installed
 function is_qemu_installed() {
-	INST_QEMU=$(which qemu-system-x86_64 2>/dev/null)
+	INST_QEMU=$(which ${QEMU_PROCESS} 2>/dev/null)
 	if [ $? -eq 0 ]
 	then
 		show_message "qemu version:" purple
-		qemu-system-x86_64 --version
+		${QEMU_PROCESS} --version
 	else
 		show_message "qemu hasn't been installed, please install qemu first." yellow bold
 		exit 1
@@ -205,8 +207,8 @@ function is_qemu_installed() {
 
 #check if hyper is cloned to local
 function is_hyperd_running() {
-	HYPERD_CNT=$(ps -aux | grep "sudo ./hyperd" | grep -v grep | wc -l)
-	if [ "${HYPERD_CNT}" -eq 1 ]
+	pgrep hyperd
+	if [ $? -eq 0 ]
 	then
 		show_message "hyperd is running:)" green
 	else
