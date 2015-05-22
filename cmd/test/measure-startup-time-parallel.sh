@@ -92,15 +92,15 @@ then
 
 		sleep 2
 		show_message "waiting " green bold
-		LAST_NO=$(ps -aux | grep "sudo hyper pod" | grep -v grep | wc -l)
+		LAST_NO=$(ps -aux | grep "sudo .*hyper pod" | grep -v grep | wc -l)
 		BEGIN_TS=$(date +"%s")
 		echo -n ${LAST_NO}
-		until [ $(ps -aux | grep "sudo hyper pod" | grep -v grep | wc -l) -eq 0 ]
+		until [ $(ps -aux | grep "sudo .*hyper pod" | grep -v grep | wc -l) -eq 0 ]
 		do
 			echo -n "."
-			if [ "${LAST_NO}" != "$(ps -aux | grep "sudo hyper pod" | grep -v grep | wc -l)" ]
+			if [ "${LAST_NO}" != "$(ps -aux | grep "sudo .*hyper pod" | grep -v grep | wc -l)" ]
 			then
-				LAST_NO=$(ps -aux | grep "sudo hyper pod" | grep -v grep | wc -l)
+				LAST_NO=$(ps -aux | grep "sudo .*hyper pod" | grep -v grep | wc -l)
 				echo -n ${LAST_NO}
 			fi
 		done
