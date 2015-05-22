@@ -3,7 +3,7 @@
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 . ${BASE_DIR}/../common.sh
 
-
+#choice time type
 echo -e -n "\n${BOLD}${PURPLE}Please choice ${WHITE}time type${PURPLE}${RESET}('i' for internal, other or 'Enter' for system time):"
 read CHOICE
 
@@ -14,6 +14,26 @@ then
 	then
 		TIME_TYPE="(internal time)"
 	fi
+fi
+
+#choice hyper cli
+echo -e -n "\n${BOLD}${PURPLE}Please choice ${WHITE}hyper client${PURPLE}${RESET}('d' for dev version, other or 'Enter' for installer version):"
+read CHOICE
+
+HYPER_CLI="hyper"
+HYPER_CLI_TYPE="(install version)"
+if [ ! -z ${CHOICE} ]
+then
+	if [ "${CHOICE}" == "d" ]
+	then
+		HYPER_CLI="./hyper"
+		TIME_TYPE="(dev version)"
+	fi
+fi
+
+if [ "${HYPER_CLI}" == "hyper" ]
+then
+	is_hyper_cli_installed
 fi
 
 show_message "measure pod startup time ${WHITE}${TIME_TYPE}${RESET}" green
@@ -58,19 +78,19 @@ then
 			touch "${LOG_FILE}"
 		fi
 
-		BEFORE=`sudo ./hyper list pod | grep "pod-.*running" | wc -l`
+		BEFORE=`sudo ${HYPER_CLI} list pod | grep "pod-.*running" | wc -l`
 
 		show_message "start create ${WHITE}${CHOICE}${GREEN} pod(s)..." green
 		for i in `seq 1 $CNT`
 		do
 		  echo -n "No. $i "`date +"%F %T" `
 		  START_TS=$(date +'%s')
-		  (time sudo ./hyper pod test/ubuntu.pod) >>"${LOG_FILE}" 2>&1
+		  (time sudo ${HYPER_CLI} pod test/ubuntu.pod) >>"${LOG_FILE}" 2>&1
 		  END_TS=$(date +'%s')
 		  echo "( ${PURPLE}$((END_TS-START_TS)) ${RESET}seconds )"
 		done
 
-		AFTER=`sudo ./hyper  list pod | grep "pod-.*running" | wc -l`
+		AFTER=`sudo ${HYPER_CLI}  list pod | grep "pod-.*running" | wc -l`
 
 		echo
 		echo "CREATED POD(S)  : ${PURPLE}${CNT}${RESET}"

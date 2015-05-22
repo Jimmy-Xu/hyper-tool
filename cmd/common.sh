@@ -207,12 +207,24 @@ function is_qemu_installed() {
 
 #check if hyper is cloned to local
 function is_hyperd_running() {
-	pgrep hyperd
+	pgrep hyperd >/dev/null 2>&1
 	if [ $? -eq 0 ]
 	then
 		show_message "hyperd is running:)" green
 	else
 		show_message "hyperd isn't running:(" red bold
+		exit 1
+	fi
+}
+
+#check if hyper is cloned to local
+function is_hyper_cli_installed() {
+	which hyper
+	if [ $? -eq 0 ]
+	then
+		show_message "hyper client is running:)" green
+	else
+		show_message "hyper client isn't running:(" red bold
 		exit 1
 	fi
 }
