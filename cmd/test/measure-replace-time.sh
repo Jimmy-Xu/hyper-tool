@@ -183,18 +183,25 @@ then
 				sudo ./hyper list | sort | grep -E "("${POD_NEW_LIST}")" | grep -n -E "(running|created)" --color
 
 
-				show_message "replace time stat result (ms):" yellow bold
-				echo "========================="
-				echo -e "min\tmax\tavg"
-				echo "-------------------------"
 				STAT_RLT=$(grep -A1 "^Successful to replace" "${LOG_FILE}" | grep real | cut -d"m" -f2 | cut -d"s" -f1 \
 				| awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){ printf "%s\t%s\t%s",min*1000,max*1000,total/count*1000}else{print ""}; }')
 
-				echo "${PURPLE}${STAT_RLT}${RESET}"
-				echo "========================="
 
+				show_message "replace time stat result (ms): [ include ${PURPLE}${#POD_OLD[@]}${RESET} pods to replace ] " yellow bold
 
-				echo -e "\nlog dir: [ ${BLUE} ${LOG_DIR} ${RESET}]"
+				#old format
+				# echo "========================="
+				# echo -e "min\tmax\tavg"
+				# echo "-------------------------"
+				# echo "${PURPLE}${STAT_RLT}${RESET}"
+				# echo "========================="
+
+				#new format for markdown
+				echo "| min | max | avg |"
+				echo "| --- | --- | --- |"
+				echo "| ${STAT_RLT} |"
+
+				echo -e "\nlog dir: [ ${BLUE} ${LINK_CURRENT} ${RESET}]"
 
 			else
 				show_message "number of running pod is different with created pod, can not replace" red bold
