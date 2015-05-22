@@ -222,9 +222,9 @@ function is_hyper_cli_installed() {
 	which hyper
 	if [ $? -eq 0 ]
 	then
-		show_message "hyper client is running:)" green
+		show_message "hyper client is installed:)" green
 	else
-		show_message "hyper client isn't running:(" red bold
+		show_message "hyper client isn't installed:(" red bold
 		exit 1
 	fi
 }
