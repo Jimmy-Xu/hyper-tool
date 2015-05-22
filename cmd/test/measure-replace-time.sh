@@ -206,7 +206,7 @@ then
 
 
 				STAT_RLT=$(grep -A1 "^Successful to replace" "${LOG_FILE}" | grep real | cut -d"m" -f2 | cut -d"s" -f1 \
-				| awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){ printf "%s | %s | %s",min*1000,max*1000,total/count*1000}else{print ""}; }')
+				| awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){ printf "%.0f | %.0f | %.0f",min*1000,max*1000,total/count*1000}else{print ""}; }')
 
 
 				show_message "replace time stat result (ms): [ include ${PURPLE}${#POD_OLD[@]}${YELLOW} pods to replace ] " yellow bold
