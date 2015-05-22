@@ -21,6 +21,28 @@ is_hyper_exist
 is_hyperd_running
 
 
+#choice hyper cli
+echo -e -n "\n${BOLD}${PURPLE}Please choice ${WHITE}hyper client${PURPLE}${RESET}('d' for dev version, other or 'Enter' for installer version):"
+read CHOICE
+
+HYPER_CLI="hyper"
+HYPER_CLI_TYPE="(install version)"
+if [ ! -z ${CHOICE} ]
+then
+	if [ "${CHOICE}" == "d" ]
+	then
+		HYPER_CLI="./hyper"
+		TIME_TYPE="(dev version)"
+	fi
+fi
+
+if [ "${HYPER_CLI}" == "hyper" ]
+then
+	is_hyper_cli_installed
+fi
+
+
+
 echo -e -n "\n${BOLD}${PURPLE}Please input the ${WHITE}number${PURPLE} of pod(s)${RESET}(>=1,press 'Enter' to cancel):"
 read CHOICE
 
@@ -54,33 +76,33 @@ then
 
 		CNT=$CHOICE
 		#create running pod(s)
-		BEFORE=`sudo ./hyper list pod | grep "pod-.*running" | wc -l`
+		BEFORE=`sudo ${HYPER_CLI} list pod | grep "pod-.*running" | wc -l`
 		show_message "[Step 1] create ${WHITE}${CHOICE}${GREEN} ${BLUE}running${GREEN} pod(s)..." green
 		for i in `seq 1 $CNT`
 		 do
 		   echo -n "No. $i "`date +"%F %T" `
 		   START_TS=$(date +'%s')
-		   (time sudo ./hyper pod test/ubuntu.pod) >>"${LOG_FILE_RUNNING}" 2>&1
+		   (time sudo ${HYPER_CLI} pod test/ubuntu.pod) >>"${LOG_FILE_RUNNING}" 2>&1
 		   END_TS=$(date +'%s')
 		   echo "( ${PURPLE}$((END_TS-START_TS)) ${RESET}seconds )"
 		done
-		AFTER=`sudo ./hyper  list pod | grep "pod-.*running" | wc -l`
+		AFTER=`sudo ${HYPER_CLI}  list pod | grep "pod-.*running" | wc -l`
 		echo "STARTED POD(S)  : ${PURPLE}${CNT}${RESET}"
 		echo "ORIG running    : ${PURPLE}${BEFORE}${RESET}"
 		echo "CURRENT running : ${PURPLE}${AFTER}${RESET}"
 
 		#create created pod(s)
-		BEFORE=`sudo ./hyper list pod | grep "pod-.*created" | wc -l`
+		BEFORE=`sudo ${HYPER_CLI} list pod | grep "pod-.*created" | wc -l`
 		show_message "[Step 2] create ${WHITE}${CHOICE}${GREEN} ${YELLOW}created${GREEN} pod(s)..." green
 		for i in `seq 1 $CNT`
 		 do
 		   echo -n "No. $i "`date +"%F %T" `
 		   START_TS=$(date +'%s')
-		   (time sudo ./hyper create test/ubuntu.pod) >>"${LOG_FILE_CREATED}" 2>&1
+		   (time sudo ${HYPER_CLI} create test/ubuntu.pod) >>"${LOG_FILE_CREATED}" 2>&1
 		   END_TS=$(date +'%s')
 		   echo "( ${PURPLE}$((END_TS-START_TS)) ${RESET}seconds )"
 		done
-		AFTER=`sudo ./hyper  list pod | grep "pod-.*created" | wc -l`
+		AFTER=`sudo ${HYPER_CLI}  list pod | grep "pod-.*created" | wc -l`
 		echo "CREATED POD(S)  : ${PURPLE}${CNT}${RESET}"
 		echo "ORIG created    : ${PURPLE}${BEFORE}${RESET}"
 		echo "CURRENT created : ${PURPLE}${AFTER}${RESET}"
@@ -138,14 +160,14 @@ then
 			echo "${BOLD}${WHITE}===================================="
 			echo "old pod status(${GREEN}running${YELLOW}${WHITE}):"
 			echo "====================================${RESET}"
-			sudo ./hyper list | sort | grep -E "("${POD_OLD_LIST}")" | grep -n -E "(running|created)" --color
-			NUM_RUNNING=$(sudo ./hyper list | grep -E "("${POD_OLD_LIST}")" | grep "pod-.*running" | wc -l )
+			sudo ${HYPER_CLI} list | sort | grep -E "("${POD_OLD_LIST}")" | grep -n -E "(running|created)" --color
+			NUM_RUNNING=$(sudo ${HYPER_CLI} list | grep -E "("${POD_OLD_LIST}")" | grep "pod-.*running" | wc -l )
 
 			echo "${BOLD}${WHITE}===================================="
 			echo "new pod status(${YELLOW}created${YELLOW}${WHITE}):"
 			echo "====================================${RESET}"
-			sudo ./hyper list | sort | grep -E "("${POD_NEW_LIST}")" | grep -n -E "(running|created)" --color
-			NUM_CREATED=$(sudo ./hyper list | grep -E "("${POD_NEW_LIST}")" | grep "pod-.*created" | wc -l )
+			sudo ${HYPER_CLI} list | sort | grep -E "("${POD_NEW_LIST}")" | grep -n -E "(running|created)" --color
+			NUM_CREATED=$(sudo ${HYPER_CLI} list | grep -E "("${POD_NEW_LIST}")" | grep "pod-.*created" | wc -l )
 
 
 			echo "${CYAN}===================================="
@@ -165,8 +187,8 @@ then
 				show_message "start replace..." green
 				for (( i = 0 ; i < ${#POD_OLD[@]} ; i++ ))
 				do
-					echo "$((i+1)): ${PURPLE}sudo ./hyper replace -o ${POD_OLD[$i]} -n ${POD_NEW[$i]} ${RESET}"
-					( time sudo ./hyper replace -o ${POD_OLD[$i]} -n ${POD_NEW[$i]} ) >>"${LOG_FILE}" 2>&1
+					echo "$((i+1)): ${PURPLE}sudo ${HYPER_CLI} replace -o ${POD_OLD[$i]} -n ${POD_NEW[$i]} ${RESET}"
+					( time sudo ${HYPER_CLI} replace -o ${POD_OLD[$i]} -n ${POD_NEW[$i]} ) >>"${LOG_FILE}" 2>&1
 				done
 
 
@@ -175,12 +197,12 @@ then
 				echo "${BOLD}${WHITE}===================================="
 				echo "old pod status(${GREEN}running${YELLOW}${WHITE}):"
 				echo "====================================${RESET}"
-				sudo ./hyper list | sort | grep -E "("${POD_OLD_LIST}")" | grep -n -E "(running|created)" --color
+				sudo ${HYPER_CLI} list | sort | grep -E "("${POD_OLD_LIST}")" | grep -n -E "(running|created)" --color
 
 				echo "${BOLD}${WHITE}===================================="
 				echo "new pod status(${YELLOW}created${YELLOW}${WHITE}):"
 				echo "====================================${RESET}"
-				sudo ./hyper list | sort | grep -E "("${POD_NEW_LIST}")" | grep -n -E "(running|created)" --color
+				sudo ${HYPER_CLI} list | sort | grep -E "("${POD_NEW_LIST}")" | grep -n -E "(running|created)" --color
 
 
 				STAT_RLT=$(grep -A1 "^Successful to replace" "${LOG_FILE}" | grep real | cut -d"m" -f2 | cut -d"s" -f1 \
