@@ -65,7 +65,7 @@ then
 
 	#count container number
 	NUM_OL_CONTAINER=$(sudo ${HYPER_CLI} list container | grep online | wc -l)
-	echo "sudo ${HYPER_CLI} list container | grep online | wc -l"
+	#echo "sudo ${HYPER_CLI} list container | grep online | wc -l"
 
 	rm -rf view-container-mem.sh
 	sudo ${HYPER_CLI} list container | grep online | awk -v hyper=${HYPER_CLI} '{printf "sudo "hyper" exec %s top -b -n1 \n",$1}' >> view-container-mem.sh
