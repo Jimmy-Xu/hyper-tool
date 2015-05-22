@@ -90,6 +90,7 @@ then
 		  echo "( ${PURPLE}$((END_TS-START_TS)) ${RESET}seconds )"
 		done
 
+		sleep 2
 		show_message "waiting " green bold
 		LAST_NO=$(ps -aux | grep "sudo hyper pod" | grep -v grep | wc -l)
 		BEGIN_TS=$(date +"%s")
