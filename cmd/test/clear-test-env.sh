@@ -16,16 +16,18 @@ cd "${GOPATH}/src/${HYPER_CLONE_DIR}"
 sudo echo
 
 
-
-show_message "stop all running pod" green
+NUM_RUNNING_POD=$(sudo ./hyper list pod | grep "pod-.*running" | wc -l)
+show_message "stop all running pod: ( ${PURPLE}${NUM_RUNNING_POD}${GREEN} )" green
 sudo ./hyper list pod | grep "pod-.*running" | awk '{print $1}' | xargs -i sudo ./hyper stop {}
-
 sleep 1
-show_message "remove all created pod" green
+
+NUM_CREATED_POD=$(sudo ./hyper list pod | grep "pod-.*created" | wc -l)
+show_message "remove all created pod: ( ${PURPLE}${NUM_CREATED_POD}${GREEN} )" green
 sudo ./hyper list pod | grep "pod-.*created" | awk '{print $1}' | xargs -i sudo ./hyper rm {}
 
 sleep 1
-show_message "kill qemu" green
+NUM_QEMU_PROCESS=$(pgrep qemu| wc -l)
+show_message "kill all qemu process: ( ${PURPLE}${NUM_QEMU_PROCESS}${GREEN} )" green
 sudo pkill qemu
 sleep 1
 
