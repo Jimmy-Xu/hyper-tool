@@ -111,11 +111,11 @@ then
 		then
 			#stat by system time
 			STAT_RLT=$(grep  -A3 "^POD id is pod-" ${LOG_FILE} | grep real | cut -d"m" -f2 | cut -d"s" -f1 \
-				| awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){ printf "%s | %s | %s",min*1000,max*1000,total/count*1000}else{print ""}; }')
+				| awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){ printf "%.0f | %.0f | %.0f",min*1000,max*1000,total/count*1000}else{print ""}; }')
 		else
 			#stat by internal time
 			STAT_RLT=$(grep  -A1 "^POD id is pod-"  ${LOG_FILE}  | grep "^Time to run a POD" | awk '{print $7}' \
-				| awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){ printf "%s | %s | %s",min*1000,max*1000,total/count*1000}else{print ""}; }')
+				| awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){ printf "%.0f | %.0f | %.0f",min,max,total/count}else{print ""}; }')
 		fi
 
 		show_message "startup time stat result (ms): ${WHITE}[ include ${PURPLE}$((AFTER-BEFORE))${RESET} running pods ] " yellow bold
@@ -132,6 +132,7 @@ then
 		echo "| min | max | avg |"
 		echo "| --- | --- | --- |"
 		echo "| ${STAT_RLT} |"
+		echo "${CYAN}${TIME_TYPE}${RESET}"
 
 		echo -e "\nlog file: [ ${BLUE} ${LINK_CURRENT} ${RESET}]"
 
