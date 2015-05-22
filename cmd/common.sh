@@ -223,12 +223,25 @@ function is_hyper_cli_installed() {
 	if [ $? -eq 0 ]
 	then
 		show_message "hyper client is installed:)" green
+		hyper version
 	else
 		show_message "hyper client isn't installed:(" red bold
 		exit 1
 	fi
 }
 
+
+function is_sysbench_installed() {
+	which sysbench
+	if [ $? -eq 0 ]
+	then
+		show_message "sysbench is installed:)" green
+		sysbench --version
+	else
+		show_message "sysbench isn't installed:(" red bold
+		exit 1
+	fi
+}
 
 function get_os_distro(){
 
