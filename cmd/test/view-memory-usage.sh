@@ -49,14 +49,13 @@ cd ${LINK_CURRENT}
 if [ -d ${LINK_CURRENT} ]
 then
 	HYPER_CLI="${GOPATH}/src/${HYPER_CLONE_DIR}/hyper"
-	show_message "${GREEN}Entering dir ${BLUE}${LINK_CURRENT}${GREEN}, hyper client path ${HYPER_CLI}" grep bold
-
+	#show_message "${GREEN}Entering dir ${BLUE}${LINK_CURRENT}${GREEN}, hyper client path ${HYPER_CLI}" grep bold
+	show_message "execute command like '${PURPLE}sudo ${HYPER_CLI} exec <container-id> top -b -n1${RESET}' " green
 	cd ${LINK_CURRENT}
 	sudo echo
 	rm -rf view-container-mem.sh
 	sudo ${HYPER_CLI} list container | grep online | awk -v hyper=${HYPER_CLI} '{printf "sudo "hyper" exec %s top -b -n1 \n",$1}' >> view-container-mem.sh
 	chmod u+x view-container-mem.sh && ./view-container-mem.sh > ./container-mem.log 2>&1
-
 	if [ $? -eq 0 ]
 	then
 		STAT_RLT_TOTAL=$(grep "^KiB Mem" container-mem.log | awk '{print $3}' | awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){ printf "%5.0f\t%5.0f\t%5.0f",min/1024,max/1024,total/count/1024}else{print ""}; }')
