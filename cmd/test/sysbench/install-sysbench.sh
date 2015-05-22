@@ -12,7 +12,7 @@ sudo apt-get install -y bzr automake autoconf make libtool
 
 show_message "download sysbench-0.5 source by bzr" green
 cd ~
-echo "Current dir : $(pwd)"
+echo "Current dir : ${BLUE}$(pwd)${RESET}"
 bzr branch lp:~sysbench-developers/sysbench/0.5  sysbench-0.5
 
 
