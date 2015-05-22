@@ -27,7 +27,7 @@ then
 	if [ "${CHOICE}" == "d" ]
 	then
 		HYPER_CLI="./hyper"
-		TIME_TYPE="(dev version)"
+		HYPER_CLI_TYPE="(dev version)"
 	fi
 fi
 
@@ -132,7 +132,9 @@ then
 		echo "| min | max | avg |"
 		echo "| --- | --- | --- |"
 		echo "| ${STAT_RLT} |"
-		echo "${CYAN}${TIME_TYPE}${RESET}"
+		echo
+		echo "time type   : ${CYAN}${TIME_TYPE}${RESET}"
+		echo "hyper client: ${CYAN}${HYPER_CLI_TYPE}${RESET}"
 
 		echo -e "\nlog file: [ ${BLUE} ${LINK_CURRENT} ${RESET}]"
 
