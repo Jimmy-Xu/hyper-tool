@@ -6,11 +6,11 @@
 
 #for hyper repo
 #HYPER_REPO="https://github.com/hyperhq/hyper.git"
-HYPER_REPO="https://github.com/getdvm/dvm-cli.git"
+HYPER_REPO="git@github.com:getdvm/dvm-cli.git"
 HYPER_CLONE_DIR="hyper"
 
 #for hyperinit repo
-HYPERINIT_REPO="https://github.com/getdvm/dvminit.git"
+HYPERINIT_REPO="git@github.com:getdvm/dvminit.git"
 HYPERINIT_CLONE_DIR="hyperstart"
 
 #for golang
@@ -100,7 +100,7 @@ function show_repo_info() {
 		git branch -a
 
 		echo -e "\n${BOLD}${CYAN}------------------- list tags --------------------${RESET}"
-		git tag --list
+		git tag
 
 		echo -e "\n${BOLD}${CYAN}------------------ show status -------------------${RESET}"
 		git status
@@ -247,7 +247,7 @@ function is_sysbench_installed() {
 function get_os_distro(){
 
 	SUPPORT_OS_TYPE=(Linux MINGW32)
-	SUPPORT_OS_DISTRO=(Ubuntu)
+	SUPPORT_OS_DISTRO=(Ubuntu CentOS)
 
 	UNAME=$(uname -a | awk 'BEGIN{FS="[_ ]"}{print $1}')
 	if echo "${SUPPORT_OS_TYPE[@]}" | grep -w "${UNAME}" &>/dev/null
