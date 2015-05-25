@@ -152,9 +152,9 @@ then
 		# echo "${CYAN}${TIME_TYPE}${RESET}"
 
 		#new format for markdown
-		echo "| min | max | avg |"
+		echo "${BOLD}${GREEN}| min | max | avg |"
 		echo "| --- | --- | --- |"
-		echo "| ${STAT_RLT} |"
+		echo "| ${STAT_RLT} |${RESET}"
 		echo
 		echo "time type   : ${CYAN}${TIME_TYPE}${RESET}"
 		echo "hyper client: ${CYAN}${HYPER_CLI_TYPE}${RESET}"

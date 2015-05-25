@@ -27,10 +27,10 @@ show_message "QEMU process memory usage(MiB): ( ${PURPLE}${NUM_QEMU_PROC}${GREEN
 # echo "==========================================="
 
 #new format for markdown
-echo "|  -  | min | max | avg |"
+echo "${BOLD}${GREEN}|  -  | min | max | avg |"
 echo "| --- | --- | --- | --- |"
 echo "|RSS(VmRSS) | ${STAT_RLT_RSS} |"
-echo "|VSZ(VmSize)| ${STAT_RLT_VSZ} |"
+echo "|VSZ(VmSize)| ${STAT_RLT_VSZ} |${GREEN}"
 
 
 
@@ -89,11 +89,11 @@ then
 
 		#new format for markdown
 		show_message "memory usage in container (MiB): ( ${PURPLE}${NUM_OL_CONTAINER}${GREEN} online container )" green
-		echo "|  -  | min | max | avg |"
+		echo "${BOLD}${GREEN}|  -  | min | max | avg |"
 		echo "| --- | --- | --- | --- |"
 		echo "|Total| ${STAT_RLT_TOTAL} |"
 		echo "|Used | ${STAT_RLT_USED} |"
-		echo "|Free | ${STAT_RLT_FREE} |"
+		echo "|Free | ${STAT_RLT_FREE} |${RESET}"
 
 	else
 		show_message "stat memory usage in container failed:(" red bold
