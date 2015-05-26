@@ -132,10 +132,10 @@ run_io_tests() {
   for io_test in seqwr seqrewr
   do
     header "I/O Test $io_test - Host Machine"
-    #bash -c "$(iotest $io_test)"
+    bash -c "$(iotest $io_test)"
 
     header "I/O Test $io_test - Docker"
-    #docker run -t $image_name bash -c "$(iotest $io_test)"
+    docker run -t $image_name bash -c "$(iotest $io_test)"
 
     header "I/O Test $io_test - Hyper"
     CONTAINER_ID=$(hyper_get_container_id)
