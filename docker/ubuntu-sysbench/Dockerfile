@@ -42,7 +42,7 @@ RUN ./configure --without-mysql
 RUN make
 RUN make install
 
-COPY ./test.sh $BASE_DIR/test.sh
+COPY ./test $BASE_DIR/test
 WORKDIR $BASE_DIR
 
 CMD sysbench --version

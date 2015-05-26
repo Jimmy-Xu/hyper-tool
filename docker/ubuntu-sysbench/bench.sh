@@ -51,20 +51,30 @@ install_sysbench() {
 
 generate_pod() {
   header "Dynamic update vcpu in pod json"
-  cat "${pod_file}.pod.tmpl" | ${BASE_DIR}/../../util/jq ".resource.vcpu=${num_threads}" > "${pod_file}.tmp"
-  ls -l "${pod_file}.pod" && cat "${pod_file}.pod" | ${BASE_DIR}/../../util/jq "."
+  cat "pod/${pod_file}.pod.tmpl" | ${BASE_DIR}/../../util/jq ".resource.vcpu=${num_threads}" > "pod/${pod_file}.pod"
+  ls -l "pod/${pod_file}.pod" && cat "pod/${pod_file}.pod" | ${BASE_DIR}/../../util/jq "."
+}
+
+run_pod() {
+  CONTAINER_ID=$(hyper_get_container_id)
+  if [ "${CONTAINER_ID}" == " " ];then
+    sudo hyper pod pod/${pod_file}.pod
+    sleep 3
+  else
+    echo "${CONTAINER_ID} already running"
+  fi
 }
 
 hyper_get_container_id() {
-  POD_NAME=$(cat "${pod_file}.pod" | ${BASE_DIR}/../../util/jq -r ".id" )
+  POD_NAME=$(cat "pod/${pod_file}.pod" | ${BASE_DIR}/../../util/jq -r ".id" )
   if [ "${POD_NAME}" == "" ];then
     echo -n " "
   else
-    POD_ID=$(hyper list | grep "${POD_NAME}.*running" | awk '{print $1}')
+    POD_ID=$(sudo hyper list | grep "${POD_NAME}.*running" | awk '{print $1}' | head -n 1 )
     if [ "${POD_ID}" == "" ];then
       echo -n " "
     else
-      CNTR_ID=$(hyper list container | grep "${POD_ID}.*online" | awk '{print $1}')
+      CNTR_ID=$(sudo hyper list container | grep "${POD_ID}.*online" | awk '{print $1}')
       if [ "${CNTR_ID}" == "" ];then
         echo -n " "
       else
@@ -86,12 +96,7 @@ run_cpu_tests() {
   header "CPU Performance Test - Hyper"
   CONTAINER_ID=$(hyper_get_container_id)
   if [ "${CONTAINER_ID}" == " " ];then
-    sudo hyper pod ${pod_file}.pod
-  fi
-  CONTAINER_ID=$(hyper_get_container_id)
-  if [ "${CONTAINER_ID}" == " " ];then
-    echo "create hyper pod failed"
-    exit 1
+    echo "create hyper pod failed" && exit 1
   fi
   sudo hyper exec ${CONTAINER_ID} /usr/local/bin/sysbench --num-threads=${num_threads} --max-requests=${max_requests} --test=cpu run
 }
@@ -101,27 +106,44 @@ run_memory_tests() {
   do
     for mode in seq rnd
     do
-      header "Host Machine Memory Test: $mode $oper"
+      header "Memory Test: $mode $oper - Host Machine"
       sysbench --num-threads=${num_threads} --max-requests=${max_requests} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run
-      header "Docker Memory Test: $mode $oper"
+
+      header "Memory Test: $mode $oper - Docker"
       docker run -t $image_name sysbench --num-threads=${num_threads} --max-requests=${max_requests} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run
+
+      header "Memory Test: $mode $oper - Hyper"
+      CONTAINER_ID=$(hyper_get_container_id)
+      if [ "${CONTAINER_ID}" == " " ];then
+        echo "create hyper pod failed" && exit 1
+      fi
+      sudo hyper exec ${CONTAINER_ID} /usr/local/bin/sysbench --num-threads=${num_threads} --max-requests=${max_requests} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run
     done
   done
 }
 
 iotest() {
-  echo "sysbench --test=fileio prepare && sysbench --num-threads=${num_threads} --max-requests=${max_requests} --file-test-mode=$1 --test=fileio run; sysbench --test=fileio cleanup"
+  echo "/usr/local/bin/sysbench --test=fileio prepare && /usr/local/bin/sysbench --num-threads=${num_threads} --max-requests=${max_requests} --file-test-mode=$1 --test=fileio run; sysbench --test=fileio cleanup"
 }
 
 run_io_tests() {
-  for io_test in $io_tests
+  file_test_mode=(seqwr seqrewr seqrd rndrd rndwr rndrw)
+  #for io_test in ${file_test_mode[@]}
+  for io_test in seqwr seqrewr
   do
-    header "Host Machine: I/O Test $io_test"
+    header "I/O Test $io_test - Host Machine"
+    #bash -c "$(iotest $io_test)"
 
-    bash -c "$(iotest $io_test)"
+    header "I/O Test $io_test - Docker"
+    #docker run -t $image_name bash -c "$(iotest $io_test)"
 
-    header "Docker: I/O Test $io_test"
-    docker run -t $image_name bash -c "$(iotest $io_test)"
+    header "I/O Test $io_test - Hyper"
+    CONTAINER_ID=$(hyper_get_container_id)
+    echo "CONTAINER_ID:[$CONTAINER_ID]"
+    if [ "${CONTAINER_ID}" == " " ];then
+      echo "create hyper pod failed" && exit 1
+    fi
+    sudo hyper exec ${CONTAINER_ID} /bin/bash -c "/root/test/io.sh "${io_test}
   done
 }
 
@@ -144,10 +166,11 @@ if [ $# -eq 1 ]; then
       echo "[ start ]"
       #prepare
       generate_pod
+      run_pod
       #start test
-      run_cpu_tests
+      #run_cpu_tests
       #run_memory_tests
-      #run_io_tests
+      run_io_tests
     ;;
     *)
       echo "usage: ./bench.sh <init>|<test>"
