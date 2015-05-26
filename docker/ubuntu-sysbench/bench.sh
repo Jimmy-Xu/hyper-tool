@@ -8,8 +8,8 @@
 #
 # edit the variables below to tweak some common parameters.
 
-#max_requests=100000
-max_requests=1000
+max_requests=100000
+#max_requests=1000
 # by default, set to number of cpus
 # just change this to a number if you want to use something fixed
 num_threads=$(cat /proc/cpuinfo | grep processor | wc -l)
