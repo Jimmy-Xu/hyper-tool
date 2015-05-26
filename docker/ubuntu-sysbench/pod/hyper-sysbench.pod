@@ -3,7 +3,7 @@
   "volumes": [],
   "files": [],
   "resource": {
-    "memory": 28,
+    "memory": 2048,
     "vcpu": 2
   },
   "containers": [
