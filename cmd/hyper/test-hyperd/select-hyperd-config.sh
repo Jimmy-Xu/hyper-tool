@@ -53,15 +53,15 @@ then
 				cat ${LINK_CURRENT}
 				echo "-----------------------------------------------"
 
-				echo -e -n "\n${BOLD}${PURPLE}Do you want to replace ${WHITE}/etc/dvm/config${PURPLE}? ${RESET}('y' for sure, press 'Enter' to cancel):"
+				echo -e -n "\n${BOLD}${PURPLE}Do you want to replace ${WHITE}/etc/hyper/config${PURPLE}? ${RESET}('y' for sure, press 'Enter' to cancel):"
 				read CHOICE
 				if [ ! -z ${CHOICE} -a "${CHOICE}" == "y" ]
 				then
-					sudo cp ${LINK_CURRENT} /etc/dvm/config
-					show_message "show /etc/dvm/config" green
-					cat /etc/dvm/config
+					sudo cp ${LINK_CURRENT} /etc/hyper/config
+					show_message "show /etc/hyper/config" green
+					cat /etc/hyper/config
 				else
-					show_message "cancel replace /etc/dvm/config" yellow bold
+					show_message "cancel replace /etc/hyper/config" yellow bold
 				fi
 
 			else

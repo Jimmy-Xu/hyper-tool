@@ -5,12 +5,12 @@
 ###################################################
 
 #for hyper repo
-HYPER_REPO="git@github.com:getdvm/dvm-cli.git"
-HYPER_CLONE_DIR="dvm"
+HYPER_REPO="git@github.com:hyperhq/hyper.git"
+HYPER_CLONE_DIR="hyper"
 
 #for hyperinit repo
-HYPERINIT_REPO="git@github.com:getdvm/dvminit.git"
-HYPERINIT_CLONE_DIR="dvminit"
+HYPERINIT_REPO="git@github.com:hyperhq/hyperStart.git"
+HYPERINIT_CLONE_DIR="hyperStart"
 
 #for golang
 GOROOT_DIR=~/go
