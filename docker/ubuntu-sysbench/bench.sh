@@ -123,7 +123,7 @@ run_memory_tests() {
 }
 
 iotest() {
-  echo "/usr/local/bin/sysbench --test=fileio prepare && /usr/local/bin/sysbench --num-threads=${num_threads} --max-requests=${max_requests} --file-test-mode=$1 --test=fileio run; sysbench --test=fileio cleanup"
+  echo "/usr/local/bin/sysbench --test=fileio prepare && /usr/local/bin/sysbench --num-threads=${num_threads} --max-requests=${max_requests} --file-test-mode=$1 --test=fileio run; /usr/local/bin/sysbench --test=fileio cleanup"
 }
 
 run_io_tests() {
@@ -143,7 +143,7 @@ run_io_tests() {
     if [ "${CONTAINER_ID}" == " " ];then
       echo "create hyper pod failed" && exit 1
     fi
-    sudo hyper exec ${CONTAINER_ID} /bin/bash -c "/root/test/io.sh "${io_test}
+    sudo hyper exec ${CONTAINER_ID} /bin/bash -c "/root/test/io.sh ${num_threads} ${max_requests} ${io_test}"
   done
 }
 
@@ -168,8 +168,8 @@ if [ $# -eq 1 ]; then
       generate_pod
       run_pod
       #start test
-      #run_cpu_tests
-      #run_memory_tests
+      run_cpu_tests
+      run_memory_tests
       run_io_tests
     ;;
     *)

@@ -29,7 +29,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
 ############################################################
 # install common packages
 ############################################################
-RUN apt-get -y install bzr make automake libc-dev  libtool
+RUN apt-get -y install bzr make automake libc-dev  libtool dos2unix
 
 ############################################################
 # compile sysbench from source
