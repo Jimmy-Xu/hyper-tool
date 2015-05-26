@@ -116,7 +116,7 @@ then
 		AFTER=`sudo ${HYPER_CLI}  list pod | grep "pod-.*running" | wc -l`
 
 		echo
-		echo "CREATED POD(S)  : ${PURPLE}${CNT}${RESET}"
+		echo "PENDING POD(S)  : ${PURPLE}${CNT}${RESET}"
 		echo "ORIG running    : ${PURPLE}${BEFORE}${RESET}"
 		echo "CURRENT running : ${PURPLE}${AFTER}${RESET}"
 

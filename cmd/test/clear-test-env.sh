@@ -21,9 +21,9 @@ show_message "stop all running pod: ( ${PURPLE}${NUM_RUNNING_POD}${GREEN} )" gre
 sudo ./hyper list pod | grep "pod-.*running" | awk '{print $1}' | xargs -i sudo ./hyper stop {}
 sleep 1
 
-NUM_CREATED_POD=$(sudo ./hyper list pod | grep "pod-.*created" | wc -l)
-show_message "remove all created pod: ( ${PURPLE}${NUM_CREATED_POD}${GREEN} )" green
-sudo ./hyper list pod | grep "pod-.*created" | awk '{print $1}' | xargs -i sudo ./hyper rm {}
+NUM_PENDING_POD=$(sudo ./hyper list pod | grep "pod-.*pending" | wc -l)
+show_message "remove all pending pod: ( ${PURPLE}${NUM_PENDING_POD}${GREEN} )" green
+sudo ./hyper list pod | grep "pod-.*pending" | awk '{print $1}' | xargs -i sudo ./hyper rm {}
 
 sleep 1
 NUM_QEMU_PROCESS=$(pgrep qemu| wc -l)
@@ -42,7 +42,7 @@ echo -e -n "${BOLD}${WHITE} running pods   : ${RESET}${PURPLE}"
 sudo ./hyper list | grep "pod-.*running" | grep -v ERROR | wc -l
 
 echo -e -n "${BOLD}${WHITE} stopped pods   : ${RESET}${PURPLE}"
-sudo ./hyper list | grep "pod-.*created" | wc -l
+sudo ./hyper list | grep "pod-.*pending" | wc -l
 
 echo -e -n "${BOLD}${WHITE} all pods       : ${RESET}${PURPLE}"
 sudo ./hyper list | grep "pod-" | wc -l

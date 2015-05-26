@@ -26,7 +26,7 @@ echo -e -n "${BOLD}${WHITE} running pods   : ${RESET}${PURPLE}"
 sudo ./hyper list | grep "pod-.*running" | grep -v ERROR | wc -l
 
 echo -e -n "${BOLD}${WHITE} stopped pods   : ${RESET}${PURPLE}"
-sudo ./hyper list | grep "pod-.*created" | wc -l
+sudo ./hyper list | grep "pod-.*pending" | wc -l
 
 echo -e -n "${BOLD}${WHITE} all pods       : ${RESET}${PURPLE}"
 sudo ./hyper list | grep "pod-.*" | wc -l

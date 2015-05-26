@@ -60,10 +60,10 @@ then
 		#create logfile
 		LOG_FILE=${LOG_DIR}/time-replace.log
 		LOG_FILE_RUNNING=${LOG_DIR}/pod-running.log
-		LOG_FILE_CREATED=${LOG_DIR}/pod-created.log
+		LOG_FILE_PENDING=${LOG_DIR}/pod-pending.log
 		touch ${LOG_FILE}
 		touch ${LOG_FILE_RUNNING}
-		touch ${LOG_FILE_CREATED}
+		touch ${LOG_FILE_PENDING}
 
 		#create link
 		LINK_CURRENT=${BASE_DIR}/../../log/replace/current
@@ -91,21 +91,21 @@ then
 		echo "ORIG running    : ${PURPLE}${BEFORE}${RESET}"
 		echo "CURRENT running : ${PURPLE}${AFTER}${RESET}"
 
-		#create created pod(s)
-		BEFORE=`sudo ${HYPER_CLI} list pod | grep "pod-.*created" | wc -l`
-		show_message "[Step 2] create ${WHITE}${CHOICE}${GREEN} ${YELLOW}created${GREEN} pod(s)..." green
+		#create pending pod(s)
+		BEFORE=`sudo ${HYPER_CLI} list pod | grep "pod-.*pending" | wc -l`
+		show_message "[Step 2] create ${WHITE}${CHOICE}${GREEN} ${YELLOW}pending${GREEN} pod(s)..." green
 		for i in `seq 1 $CNT`
 		 do
 		   echo -n "No. $i "`date +"%F %T" `
 		   START_TS=$(date +'%s')
-		   (time sudo ${HYPER_CLI} create examples/ubuntu.pod) >>"${LOG_FILE_CREATED}" 2>&1
+		   (time sudo ${HYPER_CLI} create examples/ubuntu.pod) >>"${LOG_FILE_PENDING}" 2>&1
 		   END_TS=$(date +'%s')
 		   echo "( ${PURPLE}$((END_TS-START_TS)) ${RESET}seconds )"
 		done
-		AFTER=`sudo ${HYPER_CLI}  list pod | grep "pod-.*created" | wc -l`
-		echo "CREATED POD(S)  : ${PURPLE}${CNT}${RESET}"
-		echo "ORIG created    : ${PURPLE}${BEFORE}${RESET}"
-		echo "CURRENT created : ${PURPLE}${AFTER}${RESET}"
+		AFTER=`sudo ${HYPER_CLI}  list pod | grep "pod-.*pending" | wc -l`
+		echo "PENDING POD(S)  : ${PURPLE}${CNT}${RESET}"
+		echo "ORIG pending    : ${PURPLE}${BEFORE}${RESET}"
+		echo "CURRENT pending : ${PURPLE}${AFTER}${RESET}"
 
 		#test replace
 		show_message "[Step 3] tets replace pod(s)..." green
@@ -114,11 +114,11 @@ then
 		OLD_IFS="$IFS" #save current IFS
 		IFS=$'\x0A' #enter key
 		POD_OLD=($(grep " pod-.*" ${LOG_FILE_RUNNING} | awk '{print $4}' | sort ))
-		POD_NEW=($(grep " pod-.*" ${LOG_FILE_CREATED} | awk '{print $4}' | sort ))
+		POD_NEW=($(grep " pod-.*" ${LOG_FILE_PENDING} | awk '{print $4}' | sort ))
 		IFS=${OLD_IFS}
 
 		echo "${WHITE}number of old pod(${BLUE}running${WHITE}) ${PURPLE}: ${#POD_OLD[@]} ${RESET}"
-		echo "${WHITE}number of new pod(${YELLOW}created${WHITE}) ${PURPLE}: ${#POD_NEW[@]} ${RESET}"
+		echo "${WHITE}number of new pod(${YELLOW}pending${WHITE}) ${PURPLE}: ${#POD_NEW[@]} ${RESET}"
 
 		if [ ${#POD_OLD[@]} -eq ${#POD_NEW[@]} ]
 		then
@@ -128,7 +128,7 @@ then
 			show_message "check pod status..." green
 
 			#echo -e "running pod: \n"${POD_OLD[@]}
-			#echo -e "created pod: \n"${POD_NEW[@]}
+			#echo -e "pending pod: \n"${POD_NEW[@]}
 
 			#generate POD_OLD_LIST
 			for (( i = 0 ; i < ${#POD_OLD[@]} ; i++ ))
@@ -153,21 +153,21 @@ then
 			done
 
 			#echo -e "running pod: \n"${POD_OLD_LIST}
-			#echo -e "created pod: \n"${POD_NEW_LIST}
+			#echo -e "pending pod: \n"${POD_NEW_LIST}
 
 			show_message "show pod status before replace" green bold
 
 			echo "${BOLD}${WHITE}===================================="
 			echo "old pod status(${GREEN}running${YELLOW}${WHITE}):"
 			echo "====================================${RESET}"
-			sudo ${HYPER_CLI} list | sort | grep -E "("${POD_OLD_LIST}")" | grep -n -E "(running|created)" --color
+			sudo ${HYPER_CLI} list | sort | grep -E "("${POD_OLD_LIST}")" | grep -n -E "(running|pending)" --color
 			NUM_RUNNING=$(sudo ${HYPER_CLI} list | grep -E "("${POD_OLD_LIST}")" | grep "pod-.*running" | wc -l )
 
 			echo "${BOLD}${WHITE}===================================="
-			echo "new pod status(${YELLOW}created${YELLOW}${WHITE}):"
+			echo "new pod status(${YELLOW}pending${YELLOW}${WHITE}):"
 			echo "====================================${RESET}"
-			sudo ${HYPER_CLI} list | sort | grep -E "("${POD_NEW_LIST}")" | grep -n -E "(running|created)" --color
-			NUM_CREATED=$(sudo ${HYPER_CLI} list | grep -E "("${POD_NEW_LIST}")" | grep "pod-.*created" | wc -l )
+			sudo ${HYPER_CLI} list | sort | grep -E "("${POD_NEW_LIST}")" | grep -n -E "(running|pending)" --color
+			NUM_PENDING=$(sudo ${HYPER_CLI} list | grep -E "("${POD_NEW_LIST}")" | grep "pod-.*pending" | wc -l )
 
 
 			echo "${CYAN}===================================="
@@ -177,11 +177,11 @@ then
 			echo " >required   : ${PURPLE}${#POD_OLD[@]}${RESET}"
 			echo " >real       : ${PURPLE}${NUM_RUNNING}${RESET}"
 			echo
-			echo "${BOLD}created pod${RESET}"
+			echo "${BOLD}pending pod${RESET}"
 			echo " >required   : ${PURPLE}${#POD_NEW[@]}${RESET}"
-			echo " >real       : ${PURPLE}${NUM_CREATED}${RESET}"
+			echo " >real       : ${PURPLE}${NUM_PENDING}${RESET}"
 
-			if [ ${#POD_OLD[@]} -eq ${NUM_RUNNING} -a ${#POD_NEW[@]} -eq ${NUM_CREATED} ]
+			if [ ${#POD_OLD[@]} -eq ${NUM_RUNNING} -a ${#POD_NEW[@]} -eq ${NUM_PENDING} ]
 			then
 				######################################################
 				show_message "start replace..." green
@@ -197,12 +197,12 @@ then
 				echo "${BOLD}${WHITE}===================================="
 				echo "old pod status(${GREEN}running${YELLOW}${WHITE}):"
 				echo "====================================${RESET}"
-				sudo ${HYPER_CLI} list | sort | grep -E "("${POD_OLD_LIST}")" | grep -n -E "(running|created)" --color
+				sudo ${HYPER_CLI} list | sort | grep -E "("${POD_OLD_LIST}")" | grep -n -E "(running|pending)" --color
 
 				echo "${BOLD}${WHITE}===================================="
-				echo "new pod status(${YELLOW}created${YELLOW}${WHITE}):"
+				echo "new pod status(${YELLOW}pending${YELLOW}${WHITE}):"
 				echo "====================================${RESET}"
-				sudo ${HYPER_CLI} list | sort | grep -E "("${POD_NEW_LIST}")" | grep -n -E "(running|created)" --color
+				sudo ${HYPER_CLI} list | sort | grep -E "("${POD_NEW_LIST}")" | grep -n -E "(running|pending)" --color
 
 
 				STAT_RLT=$(grep -A1 "^Successful to replace" "${LOG_FILE}" | grep real | cut -d"m" -f2 | cut -d"s" -f1 \
@@ -226,7 +226,7 @@ then
 				echo -e "\nlog dir: [ ${BLUE} ${LINK_CURRENT} ${RESET}]"
 
 			else
-				show_message "number of running pod is different with created pod, can not replace" red bold
+				show_message "number of running pod is different with pending pod, can not replace" red bold
 			fi
 
 		else
