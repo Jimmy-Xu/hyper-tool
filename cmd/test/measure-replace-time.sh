@@ -82,7 +82,7 @@ then
 		 do
 		   echo -n "No. $i "`date +"%F %T" `
 		   START_TS=$(date +'%s')
-		   (time sudo ${HYPER_CLI} pod test/ubuntu.pod) >>"${LOG_FILE_RUNNING}" 2>&1
+		   (time sudo ${HYPER_CLI} pod examples/ubuntu.pod) >>"${LOG_FILE_RUNNING}" 2>&1
 		   END_TS=$(date +'%s')
 		   echo "( ${PURPLE}$((END_TS-START_TS)) ${RESET}seconds )"
 		done
@@ -98,7 +98,7 @@ then
 		 do
 		   echo -n "No. $i "`date +"%F %T" `
 		   START_TS=$(date +'%s')
-		   (time sudo ${HYPER_CLI} create test/ubuntu.pod) >>"${LOG_FILE_CREATED}" 2>&1
+		   (time sudo ${HYPER_CLI} create examples/ubuntu.pod) >>"${LOG_FILE_CREATED}" 2>&1
 		   END_TS=$(date +'%s')
 		   echo "( ${PURPLE}$((END_TS-START_TS)) ${RESET}seconds )"
 		done

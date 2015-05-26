@@ -5,11 +5,12 @@
 ###################################################
 
 #for hyper repo
-HYPER_REPO="git@github.com:hyperhq/hyper.git"
+#HYPER_REPO="https://github.com/hyperhq/hyper.git"
+HYPER_REPO="https://github.com/getdvm/dvm-cli.git"
 HYPER_CLONE_DIR="hyper"
 
 #for hyperinit repo
-HYPERINIT_REPO="git@github.com:hyperhq/hyperStart.git"
+HYPERINIT_REPO="https://github.com/hyperhq/hyperStart.git"
 HYPERINIT_CLONE_DIR="hyperStart"
 
 #for golang

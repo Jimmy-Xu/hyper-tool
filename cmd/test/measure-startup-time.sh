@@ -85,7 +85,7 @@ then
 		do
 		  echo -n "No. $i "`date +"%F %T" `
 		  START_TS=$(date +'%s')
-		  (time sudo ${HYPER_CLI} pod test/ubuntu.pod) >>"${LOG_FILE}" 2>&1
+		  (time sudo ${HYPER_CLI} pod examples/ubuntu.pod) >>"${LOG_FILE}" 2>&1
 		  END_TS=$(date +'%s')
 		  echo "( ${PURPLE}$((END_TS-START_TS)) ${RESET}seconds )"
 		done

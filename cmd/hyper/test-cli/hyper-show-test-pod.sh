@@ -17,7 +17,7 @@ show_message "list test pod" green
 echo -e "${BOLD}${CYAN}===================================================="
 echo " Here are all pod(s) for test :"
 echo "====================================================${RESET}"
-ls -l --color test/*.pod
+ls -l --color examples/*.pod
 
 
 echo -e -n "\n${BOLD}${PURPLE}Please input the ${WHITE}pod json filename${PURPLE}${RESET}(example: ${YELLOW}ubuntu${RESET}, or press 'Enter' to cancel):"
@@ -25,7 +25,7 @@ read CHOICE
 
 if [ ! -z ${CHOICE} ]
 then
-	POD_PATH="test/${CHOICE}.pod"
+	POD_PATH="examples/${CHOICE}.pod"
 	if [ -f "${POD_PATH}" ]
 	then
 		echo -e "${BOLD}${YELLOW}===================================================="
