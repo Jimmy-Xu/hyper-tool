@@ -18,15 +18,6 @@ TOTAL_CPUNUM=""
 CPU_NUM=$(cat /proc/cpuinfo | grep processor | wc -l)
 MEMORY_SIZE=$((1*1024))  #(MiB)
 
-#cpuset-cpus for docker
-CPU_SET=($(seq 0 $((CPU_NUM-1))))
-CPU_SET="${CPU_SET[@]}"
-
-#sysbench cpu test parameter
-NUM_THREADS=${CPU_NUM}
-MAX_REQUESTS=$((CPU_NUM*1000))
-CPU_MAX_PRIME=$((CPU_NUM*1000))
-
 #docker image and pod
 DOCKER_IMAGE="hyper:sysbench"
 POD_FILENAME="hyper-sysbench"
@@ -150,33 +141,78 @@ function show_test_cmd() {
   echo "${YELLOW}$1 "
 }
 
+function pause() {
+  read -n 1 -p "${LEFT_PAD}${BLUE}Press any key to continue...${RESET}"
+}
+
+function input_cpu_and_memory() {
+
+  SET_CPU_DONE="false"
+  until [[ "${SET_CPU_DONE}" == "true" ]];do
+    echo -e -n "\n${BOLD}${PURPLE}Please input the ${WHITE}number${PURPLE} of vcpu${RESET}(>=1,press 'Enter' for 1):"
+    read CHOICE
+    if [ ! -z ${CHOICE} ];then
+      if [[ $CHOICE =~ ^[[:digit:]]+$ ]] && [[ ${CHOICE} -ge 1 ]];then
+        CPU_NUM=${CHOICE}
+        SET_CPU_DONE="true"
+      else
+        echo "${CHOICE} is a invalid number, please input a valid cpu number!"
+      fi
+    else
+      CPU_NUM=1
+      SET_CPU_DONE="true"
+    fi
+  done
+}
+
+
+function generate_test_parameter() {
+  #cpuset-cpus for docker
+  CPU_SET=($(seq 0 $((CPU_NUM-1))))
+  CPU_SET="${CPU_SET[@]}"
+
+  #sysbench cpu test parameter
+  NUM_THREADS=${CPU_NUM}
+  MAX_REQUESTS=$((CPU_NUM*1000))
+  CPU_MAX_PRIME=$((CPU_NUM*1000))
+}
+
+
 function show_test_parameter() {
   echo "${CYAN}"
   title "List all test parameter"
 
   echo "----------- total resource -----------"
-  echo " TOTAL_MEMSIZE : ${TOTAL_MEMSIZE} (MB)"
-  echo " TOTAL_CPUNUM  : ${TOTAL_CPUNUM}"
+  echo " TOTAL_MEMSIZE : ${WHITE}${TOTAL_MEMSIZE}${CYAN} (MB)"
+  echo " TOTAL_CPUNUM  : ${WHITE}${TOTAL_CPUNUM}${CYAN}"
   echo
 
   echo "---------- resource to test ----------"
-  echo " CPU_NUM       : ${CPU_NUM}"
-  echo " MEMORY_SIZE   : ${MEMORY_SIZE} (MB)"
+  echo " CPU_NUM       : ${WHITE}${CPU_NUM}${CYAN}"
+  echo " MEMORY_SIZE   : ${WHITE}${MEMORY_SIZE}${CYAN} (MB)"
   echo
 
   echo "------------ docke image -------------"
-  echo " DOCKER_IMAGE: ${DOCKER_IMAGE}"
+  echo " DOCKER_IMAGE: ${WHITE}${DOCKER_IMAGE}${CYAN}"
   echo
 
   echo "------- parameter for docker --------"
-  echo " --memory=${MEMORY_SIZE}m"
-  echo " --cpuset-cpus=${CPU_SET/ /,}"
+  echo " --memory=${WHITE}${MEMORY_SIZE}m${CYAN}"
+  echo " --cpuset-cpus=${WHITE}${CPU_SET/ /,}${CYAN}"
   echo
 
   echo "--------- cpu test parameter----------"
-  echo " NUM_THREADS   : ${NUM_THREADS}"
-  echo " MAX_REQUESTS  : ${MAX_REQUESTS}"
-  echo " CPU_MAX_PRIME : ${CPU_MAX_PRIME}"
+  echo " NUM_THREADS   : ${WHITE}${NUM_THREADS}${CYAN}"
+  echo " MAX_REQUESTS  : ${WHITE}${MAX_REQUESTS}${CYAN}"
+  echo " CPU_MAX_PRIME : ${WHITE}${CPU_MAX_PRIME}${CYAN}"
+
+  #check parameter
+  if [ -z "${CPU_NUM}" -o -z "${MEMORY_SIZE}" -o -z "${DOCKER_IMAGE}" -o -z "${CPU_SET}" -o -z "${NUM_THREADS}" -o -z "${MAX_REQUESTS}" -o -z "${CPU_MAX_PRIME}" ];then
+    echo "Error, some parameter is empty, exit!"
+    exit 1
+  else
+    pause
+  fi
   echo "${RESET}"
 }
 
@@ -186,15 +222,20 @@ function start_test() {
   TEST_TARGET=("$1")
   TEST_ITEM=("$2")
   echo "start test [${TEST_TARGET}] [${TEST_ITEM}]"
-  #1
+
+  #1 get system cpu and memory
   fetch_total_cpu_memory
-  #2
-  generate_pod
-  #3
-  run_pod
-  #4
+
+  #2 prepare test parameter
+  input_cpu_and_memory
+  generate_test_parameter
   show_test_parameter
-  #5
+
+  #3 create hyper pod
+  generate_pod
+  run_pod
+
+  #4 start test
   if (echo "${TEST_ITEM[@]}" | grep -w "cpu" &>/dev/null);then
     do_cpu_test "${TEST_TARGET}"
   elif (echo "${TEST_ITEM[@]}" | grep -w "memory" &>/dev/null);then
