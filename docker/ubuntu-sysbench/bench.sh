@@ -5,7 +5,7 @@
 #######################################
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 JQ=${BASE_DIR}/../../util/jq
-DRY_RUN="false" #true|false
+DRY_RUN="true" #true|false
 
 #######################################
 # Parameter
@@ -145,7 +145,7 @@ function pause() {
   read -n 1 -p "${LEFT_PAD}${BLUE}Press any key to continue...${RESET}"
 }
 
-function input_cpu_and_memory() {
+function input_cpu_number() {
 
   SET_CPU_DONE="false"
   until [[ "${SET_CPU_DONE}" == "true" ]];do
@@ -156,11 +156,31 @@ function input_cpu_and_memory() {
         CPU_NUM=${CHOICE}
         SET_CPU_DONE="true"
       else
-        echo "${CHOICE} is a invalid number, please input a valid cpu number!"
+        echo "${CHOICE} is an invalid number, please input a valid cpu number!"
       fi
     else
       CPU_NUM=1
       SET_CPU_DONE="true"
+    fi
+  done
+}
+
+function input_memory_size() {
+
+  SET_MEM_DONE="false"
+  until [[ "${SET_MEM_DONE}" == "true" ]];do
+    echo -e -n "\n${BOLD}${PURPLE}Please input the ${WHITE}size${PURPLE} of memory${RESET}(MB)(>=28,press 'Enter' for 1024):"
+    read CHOICE
+    if [ ! -z ${CHOICE} ];then
+      if [[ $CHOICE =~ ^[[:digit:]]+$ ]] && [[ ${CHOICE} -ge 28 ]];then
+        MEMORY_SIZE=${CHOICE}
+        SET_MEM_DONE="true"
+      else
+        echo "${CHOICE} is an invalid number, please input a valid memory size!"
+      fi
+    else
+      MEMORY_SIZE=1024
+      SET_MEM_DONE="true"
     fi
   done
 }
@@ -211,6 +231,7 @@ function show_test_parameter() {
     echo "Error, some parameter is empty, exit!"
     exit 1
   else
+    echo
     pause
   fi
   echo "${RESET}"
@@ -227,7 +248,8 @@ function start_test() {
   fetch_total_cpu_memory
 
   #2 prepare test parameter
-  input_cpu_and_memory
+  input_cpu_number
+  input_memory_size
   generate_test_parameter
   show_test_parameter
 
