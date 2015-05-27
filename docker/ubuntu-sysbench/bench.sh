@@ -50,6 +50,78 @@ function title() {
   echo "────────────────────────────────────────────────────────"
 }
 
+
+function generate_test_parameter() {
+  #cpuset-cpus for docker
+  CPU_SET=($(seq 0 $((CPU_NUM-1))))
+  CPU_SET="${CPU_SET[@]}"
+
+  #sysbench cpu test parameter
+  _NUM_THREADS=${CPU_NUM}
+  _MAX_REQUESTS=$((CPU_NUM*20000))
+  _CPU_MAX_PRIME=$((CPU_NUM*20000))
+
+  #sysbench mem test parameter
+  _DATA_SIZE=$((CPU_NUM*20))
+
+  #sysbench io test parameter
+  _FILE_SIZE=$((CPU_NUM/4))
+  if [ ${_FILE_SIZE} -eq 0 ];then
+    _FILE_SIZE=1
+  fi
+}
+
+
+function show_test_parameter() {
+  echo "${CYAN}"
+  title "List all test parameter"
+
+  echo "----------- total resource -----------"
+  echo " TOTAL_CPUNUM  : ${WHITE}${TOTAL_CPUNUM}${CYAN}"
+  echo " TOTAL_MEMSIZE : ${WHITE}${TOTAL_MEMSIZE}${CYAN} (MB)"
+  echo
+
+  echo "---------- resource to test ----------"
+  echo " CPU_NUM       : ${WHITE}${CPU_NUM}${CYAN}"
+  echo " MEMORY_SIZE   : ${WHITE}${MEMORY_SIZE}${CYAN} (MB)"
+  echo
+
+  echo "------------ docke image -------------"
+  echo " DOCKER_IMAGE: ${WHITE}${DOCKER_IMAGE}${CYAN}"
+  echo
+
+  echo "------- parameter for docker --------"
+  echo " --memory=${WHITE}${MEMORY_SIZE}m${CYAN}"
+  echo " --cpuset-cpus=${WHITE}${CPU_SET// /,}${CYAN}"
+  echo
+
+  echo "--------- cpu test parameter----------"
+  echo " _NUM_THREADS   : ${WHITE}${_NUM_THREADS}${CYAN}"
+  echo " _MAX_REQUESTS  : ${WHITE}${_MAX_REQUESTS}${CYAN}"
+  echo " _CPU_MAX_PRIME : ${WHITE}${_CPU_MAX_PRIME}${CYAN}"
+  echo
+
+  echo "-------- memory test parameter---------"
+  echo " _DATA_SIZE : ${WHITE}${_DATA_SIZE}${CYAN} (GB)"
+  echo
+
+  echo "---------- io test parameter-----------"
+  echo " _FILE_SIZE : ${WHITE}${_FILE_SIZE}${CYAN} (GB)"
+  echo
+
+
+  #check parameter
+  if [ -z "${CPU_NUM}" -o -z "${MEMORY_SIZE}" -o -z "${DOCKER_IMAGE}" -o -z "${CPU_SET}" -o -z "${_NUM_THREADS}" -o -z "${_MAX_REQUESTS}" -o -z "${_CPU_MAX_PRIME}" -o -z "${_DATA_SIZE}" ];then
+    echo "Error, some parameter is empty, exit!"
+    exit 1
+  else
+    echo
+    pause
+  fi
+  echo "${RESET}"
+}
+
+
 function fetch_total_cpu_memory() {
   TOTAL_MEMSIZE=$(cat /proc/meminfo | grep MemTotal | awk '{printf "%0.f", $2/1024}')
   TOTAL_CPUNUM=$(cat /proc/cpuinfo | grep processor | wc -l)
@@ -182,76 +254,6 @@ function input_memory_size() {
   done
 }
 
-
-function generate_test_parameter() {
-  #cpuset-cpus for docker
-  CPU_SET=($(seq 0 $((CPU_NUM-1))))
-  CPU_SET="${CPU_SET[@]}"
-
-  #sysbench cpu test parameter
-  _NUM_THREADS=${CPU_NUM}
-  _MAX_REQUESTS=$((CPU_NUM*10000))
-  _CPU_MAX_PRIME=$((CPU_NUM*10000))
-
-  #sysbench mem test parameter
-  _DATA_SIZE=$((CPU_NUM*20))
-
-  #sysbench io test parameter
-  _FILE_SIZE=$((CPU_NUM/4))
-  if [ ${_FILE_SIZE} -eq 0 ];then
-    _FILE_SIZE=1
-  fi
-}
-
-
-function show_test_parameter() {
-  echo "${CYAN}"
-  title "List all test parameter"
-
-  echo "----------- total resource -----------"
-  echo " TOTAL_CPUNUM  : ${WHITE}${TOTAL_CPUNUM}${CYAN}"
-  echo " TOTAL_MEMSIZE : ${WHITE}${TOTAL_MEMSIZE}${CYAN} (MB)"
-  echo
-
-  echo "---------- resource to test ----------"
-  echo " CPU_NUM       : ${WHITE}${CPU_NUM}${CYAN}"
-  echo " MEMORY_SIZE   : ${WHITE}${MEMORY_SIZE}${CYAN} (MB)"
-  echo
-
-  echo "------------ docke image -------------"
-  echo " DOCKER_IMAGE: ${WHITE}${DOCKER_IMAGE}${CYAN}"
-  echo
-
-  echo "------- parameter for docker --------"
-  echo " --memory=${WHITE}${MEMORY_SIZE}m${CYAN}"
-  echo " --cpuset-cpus=${WHITE}${CPU_SET// /,}${CYAN}"
-  echo
-
-  echo "--------- cpu test parameter----------"
-  echo " _NUM_THREADS   : ${WHITE}${_NUM_THREADS}${CYAN}"
-  echo " _MAX_REQUESTS  : ${WHITE}${_MAX_REQUESTS}${CYAN}"
-  echo " _CPU_MAX_PRIME : ${WHITE}${_CPU_MAX_PRIME}${CYAN}"
-  echo
-
-  echo "-------- memory test parameter---------"
-  echo " _DATA_SIZE : ${WHITE}${_DATA_SIZE}${CYAN} (GB)"
-  echo
-
-  echo "---------- io test parameter-----------"
-  echo " _FILE_SIZE : ${WHITE}${_FILE_SIZE}${CYAN} (GB)"
-  echo
-
-
-  #check parameter
-  if [ -z "${CPU_NUM}" -o -z "${MEMORY_SIZE}" -o -z "${DOCKER_IMAGE}" -o -z "${CPU_SET}" -o -z "${_NUM_THREADS}" -o -z "${_MAX_REQUESTS}" -o -z "${_CPU_MAX_PRIME}" -o -z "${_DATA_SIZE}" ];then
-    echo "Error, some parameter is empty, exit!"
-    exit 1
-  else
-    echo
-    pause
-  fi
-  echo "${RESET}"
-}
 
 ###########################################
 
