@@ -137,10 +137,6 @@ function clean_pod() {
   echo -e "\nclean done"
 }
 
-function show_test_cmd() {
-  echo "${YELLOW}$1 "
-}
-
 function pause() {
   read -n 1 -p "${LEFT_PAD}${BLUE}Press any key to continue...${RESET}"
 }
@@ -271,6 +267,20 @@ function start_test() {
   fi
 }
 
+
+function show_test_cmd() {
+  START_TS=$( date +"%s" )
+  START_TIME=$( date +"%F %T" )
+  echo " ${YELLOW}$1 "
+}
+
+function show_test_time() {
+  END_TS=$( date +"%s" )
+  END_TIME=$( date +"%F %T" )
+  TEST_NAME="$1"
+  echo -e "\n${LIGHT}${GREEN}[test name] ${TEST_NAME} : ${START_TIME} - ${END_TIME} : $((END_TS - START_TS)) (seconds)\n${RESET}"
+}
+
 function do_cpu_test() {
   TEST_TARGET=("$1")
 
@@ -282,6 +292,7 @@ function do_cpu_test() {
     if [ "${DRY_RUN}" != "true" ];then
       sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --cpu-max-prime=${CPU_MAX_PRIME} --test=cpu run
     fi
+    show_test_time "host - cpu"
   fi
 
   if (echo "${TEST_TARGET[@]}" | grep -w "docker" &>/dev/null);then
@@ -292,6 +303,7 @@ function do_cpu_test() {
     if [ "${DRY_RUN}" != "true" ];then
       docker run -t -m=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --cpu-max-prime=${CPU_MAX_PRIME} --test=cpu run
     fi
+    show_test_time "docker - cpu"
   fi
 
   if (echo "${TEST_TARGET[@]}" | grep -w "hyper" &>/dev/null);then
@@ -306,9 +318,11 @@ function do_cpu_test() {
     if [ "${DRY_RUN}" != "true" ];then
       sudo hyper exec ${CONTAINER_ID} /usr/local/bin/sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --cpu-max-prime=${CPU_MAX_PRIME} --test=cpu run
     fi
+    show_test_time "hyper - cpu"
   fi
   echo "${RESET}"
 }
+
 
 function do_memory_test() {
   TEST_TARGET=("$1")
@@ -325,6 +339,7 @@ function do_memory_test() {
         if [ "${DRY_RUN}" != "true" ];then
           sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run
         fi
+        show_test_time "host - mem - ${mode} ${oper}"
       fi
 
       if (echo "${TEST_TARGET[@]}" | grep -w "docker" &>/dev/null);then
@@ -335,6 +350,7 @@ function do_memory_test() {
         if [ "${DRY_RUN}" != "true" ];then
           docker run -t -m=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run
         fi
+        show_test_time "docker - mem - ${mode} ${oper}"
       fi
 
       if (echo "${TEST_TARGET[@]}" | grep -w "docker" &>/dev/null);then
@@ -349,6 +365,7 @@ function do_memory_test() {
         if [ "${DRY_RUN}" != "true" ];then
           sudo hyper exec ${CONTAINER_ID} /usr/local/bin/sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run
         fi
+        show_test_time "hyper - mem - ${mode} ${oper}"
       fi
       echo "${RESET}"
     done
@@ -372,6 +389,7 @@ function do_io_test() {
       if [ "${DRY_RUN}" != "true" ];then
         bash -c "$(iotest_cmd $io_test)"
       fi
+      show_test_time "host - io - ${io_test}"
     fi
 
     if (echo "${TEST_TARGET[@]}" | grep -w "docker" &>/dev/null);then
@@ -382,6 +400,7 @@ function do_io_test() {
       if [ "${DRY_RUN}" != "true" ];then
         docker run -t -m=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} bash -c "$(iotest_cmd $io_test)"
       fi
+      show_test_time "docker - io - ${io_test}"
     fi
 
     if (echo "${TEST_TARGET[@]}" | grep -w "docker" &>/dev/null);then
@@ -397,6 +416,7 @@ function do_io_test() {
       if [ "${DRY_RUN}" != "true" ];then
         sudo hyper exec ${CONTAINER_ID} /bin/bash -c "/root/test/io.sh ${NUM_THREADS} ${MAX_REQUESTS} ${io_test}"
       fi
+      show_test_time "hyper - io - ${io_test}"
     fi
     echo "${RESET}"
   done
