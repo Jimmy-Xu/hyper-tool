@@ -5,8 +5,8 @@
 #######################################
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 JQ=${BASE_DIR}/../../util/jq
-DRY_RUN="true"
-#DRY_RUN="false"
+#DRY_RUN="true"
+DRY_RUN="false"
 
 #######################################
 # Parameter
@@ -199,9 +199,7 @@ function generate_test_parameter() {
   #sysbench io test parameter
   _FILE_SIZE=$((CPU_NUM/4))
   if [ ${_FILE_SIZE} -eq 0 ];then
-    _FILE_SIZE=512
-  else
-    _FILE_SIZE=$((_FILE_SIZE*1024))
+    _FILE_SIZE=1
   fi
 }
 
@@ -233,12 +231,15 @@ function show_test_parameter() {
   echo " _NUM_THREADS   : ${WHITE}${_NUM_THREADS}${CYAN}"
   echo " _MAX_REQUESTS  : ${WHITE}${_MAX_REQUESTS}${CYAN}"
   echo " _CPU_MAX_PRIME : ${WHITE}${_CPU_MAX_PRIME}${CYAN}"
+  echo
 
   echo "-------- memory test parameter---------"
   echo " _DATA_SIZE : ${WHITE}${_DATA_SIZE}${CYAN} (GB)"
+  echo
 
   echo "---------- io test parameter-----------"
-  echo " _FILE_SIZE : ${WHITE}${_FILE_SIZE}${CYAN} (MB)"
+  echo " _FILE_SIZE : ${WHITE}${_FILE_SIZE}${CYAN} (GB)"
+  echo
 
 
   #check parameter
@@ -392,7 +393,7 @@ function do_memory_test() {
 }
 
 function iotest_cmd() {
-  echo "/usr/local/bin/sysbench --test=fileio prepare && /usr/local/bin/sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --file-test-mode=$1 --test=fileio --file-total-size=${_FILE_SIZE}M run; /usr/local/bin/sysbench --test=fileio cleanup"
+  echo "/usr/local/bin/sysbench --test=fileio --file-total-size=${_FILE_SIZE}G prepare && /usr/local/bin/sysbench --test=fileio --file-total-size=${_FILE_SIZE}G --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --file-test-mode=$1 run; /usr/local/bin/sysbench --test=fileio --file-total-size=${_FILE_SIZE}G cleanup"
 }
 
 function do_io_test() {
@@ -431,7 +432,7 @@ function do_io_test() {
       if [ "${CONTAINER_ID}" == " " ];then
         echo "hyper container not exist, exit!" && exit 1
       fi
-      show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} /bin/bash -c \"/root/test/io.sh ${_NUM_THREADS} ${_MAX_REQUESTS} ${io_test}\" ]${BLUE}"
+      show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} /bin/bash -c \"/root/test/io.sh ${_NUM_THREADS} ${_MAX_REQUESTS} ${_FILE_SIZE} ${io_test}\" ]${BLUE}"
       if [ "${DRY_RUN}" != "true" ];then
         sudo hyper exec ${CONTAINER_ID} /bin/bash -c "/root/test/io.sh ${_NUM_THREADS} ${_MAX_REQUESTS} ${_FILE_SIZE} ${io_test}"
       fi
