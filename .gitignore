@@ -1,5 +1,6 @@
 *.log
 *.html
+docker/ubuntu-sysbench/log/*.log
 docker/ubuntu-sysbench/pod/*.pod
 kernel/
 log/
