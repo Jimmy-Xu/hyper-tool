@@ -9,3 +9,10 @@ docker exec -it 32538b49864c /bin/bash
 ##do sysbench test
  ./test.sh 1 && echo "---------" &&  ./test.sh 2
 
+########################################
+
+#build docker image, create test pod
+./bench.sh init
+
+#test cpu,memory,io in host, docker and hyper
+./bench.sh test
