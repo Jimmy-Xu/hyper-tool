@@ -192,6 +192,9 @@ function generate_test_parameter() {
   _NUM_THREADS=${CPU_NUM}
   _MAX_REQUESTS=$((CPU_NUM*1000))
   _CPU_MAX_PRIME=$((CPU_NUM*1000))
+
+  #sysbench mem test parameter
+  _DATA_SIZE=$((CPU_NUM*10))
 }
 
 
@@ -223,8 +226,11 @@ function show_test_parameter() {
   echo " _MAX_REQUESTS  : ${WHITE}${_MAX_REQUESTS}${CYAN}"
   echo " _CPU_MAX_PRIME : ${WHITE}${_CPU_MAX_PRIME}${CYAN}"
 
+  echo "-------- memory test parameter---------"
+  echo " _DATA_SIZE : ${WHITE}${_DATA_SIZE}${CYAN} (GB)"
+
   #check parameter
-  if [ -z "${CPU_NUM}" -o -z "${MEMORY_SIZE}" -o -z "${DOCKER_IMAGE}" -o -z "${CPU_SET}" -o -z "${_NUM_THREADS}" -o -z "${_MAX_REQUESTS}" -o -z "${_CPU_MAX_PRIME}" ];then
+  if [ -z "${CPU_NUM}" -o -z "${MEMORY_SIZE}" -o -z "${DOCKER_IMAGE}" -o -z "${CPU_SET}" -o -z "${_NUM_THREADS}" -o -z "${_MAX_REQUESTS}" -o -z "${_CPU_MAX_PRIME}" -o -z "${_DATA_SIZE}" ];then
     echo "Error, some parameter is empty, exit!"
     exit 1
   else
@@ -336,9 +342,9 @@ function do_memory_test() {
         echo "${WHITE}"
         TESTCOUNT=$((TESTCOUNT+1))
         title "${TESTCOUNT}. Memory Test: $mode $oper - Host OS"
-        show_test_cmd  " [ sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run ]${WHITE}"
+        show_test_cmd  " [ sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} --memory-total-size=${_DATA_SIZE}G run ]${WHITE}"
         if [ "${DRY_RUN}" != "true" ];then
-          sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run
+          sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} --memory-total-size=${_DATA_SIZE}G run
         fi
         show_test_time "host - mem - ${mode} ${oper}"
       fi
@@ -347,9 +353,9 @@ function do_memory_test() {
         echo "${GREEN}"
         TESTCOUNT=$((TESTCOUNT+1))
         title "${TESTCOUNT}. Memory Test: $mode $oper - Docker"
-        show_test_cmd  " [ docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run ]${GREEN}"
+        show_test_cmd  " [ docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} --memory-total-size=${_DATA_SIZE}G run ]${GREEN}"
         if [ "${DRY_RUN}" != "true" ];then
-          docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run
+          docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} --memory-total-size=${_DATA_SIZE}G run
         fi
         show_test_time "docker - mem - ${mode} ${oper}"
       fi
@@ -362,9 +368,9 @@ function do_memory_test() {
         if [ "${CONTAINER_ID}" == " " ];then
           echo "hyper container not exist, exit!" && exit 1
         fi
-        show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} /usr/local/bin/sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run ]${BLUE}"
+        show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} /usr/local/bin/sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} --memory-total-size=${_DATA_SIZE}G run ]${BLUE}"
         if [ "${DRY_RUN}" != "true" ];then
-          sudo hyper exec ${CONTAINER_ID} /usr/local/bin/sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run
+          sudo hyper exec ${CONTAINER_ID} /usr/local/bin/sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} --memory-total-size=${_DATA_SIZE}G run
         fi
         show_test_time "hyper - mem - ${mode} ${oper}"
       fi
