@@ -242,7 +242,7 @@ function show_test_parameter() {
 function start_test() {
   TEST_TARGET=("$1")
   TEST_ITEM=("$2")
-  echo "start test [${TEST_TARGET}] [${TEST_ITEM}]"
+  echo "${LIGHT}${YELLOW}start test [${TEST_TARGET}] [${TEST_ITEM}]${RESET}"
 
   #1 get system cpu and memory
   fetch_total_cpu_memory
