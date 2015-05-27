@@ -5,8 +5,8 @@
 #######################################
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 JQ=${BASE_DIR}/../../util/jq
-#DRY_RUN="true"
-DRY_RUN="false"
+DRY_RUN="true"
+#DRY_RUN="false"
 
 #######################################
 # Parameter
@@ -189,9 +189,9 @@ function generate_test_parameter() {
   CPU_SET="${CPU_SET[@]}"
 
   #sysbench cpu test parameter
-  NUM_THREADS=${CPU_NUM}
-  MAX_REQUESTS=$((CPU_NUM*1000))
-  CPU_MAX_PRIME=$((CPU_NUM*1000))
+  _NUM_THREADS=${CPU_NUM}
+  _MAX_REQUESTS=$((CPU_NUM*1000))
+  _CPU_MAX_PRIME=$((CPU_NUM*1000))
 }
 
 
@@ -219,12 +219,12 @@ function show_test_parameter() {
   echo
 
   echo "--------- cpu test parameter----------"
-  echo " NUM_THREADS   : ${WHITE}${NUM_THREADS}${CYAN}"
-  echo " MAX_REQUESTS  : ${WHITE}${MAX_REQUESTS}${CYAN}"
-  echo " CPU_MAX_PRIME : ${WHITE}${CPU_MAX_PRIME}${CYAN}"
+  echo " _NUM_THREADS   : ${WHITE}${_NUM_THREADS}${CYAN}"
+  echo " _MAX_REQUESTS  : ${WHITE}${_MAX_REQUESTS}${CYAN}"
+  echo " _CPU_MAX_PRIME : ${WHITE}${_CPU_MAX_PRIME}${CYAN}"
 
   #check parameter
-  if [ -z "${CPU_NUM}" -o -z "${MEMORY_SIZE}" -o -z "${DOCKER_IMAGE}" -o -z "${CPU_SET}" -o -z "${NUM_THREADS}" -o -z "${MAX_REQUESTS}" -o -z "${CPU_MAX_PRIME}" ];then
+  if [ -z "${CPU_NUM}" -o -z "${MEMORY_SIZE}" -o -z "${DOCKER_IMAGE}" -o -z "${CPU_SET}" -o -z "${_NUM_THREADS}" -o -z "${_MAX_REQUESTS}" -o -z "${_CPU_MAX_PRIME}" ];then
     echo "Error, some parameter is empty, exit!"
     exit 1
   else
@@ -272,7 +272,7 @@ function start_test() {
 function show_test_cmd() {
   START_TS=$( date +"%s" )
   START_TIME=$( date +"%F %T" )
-  echo " ${YELLOW} test command line : $1 "
+  echo "test command line : ${YELLOW}$1 "
 }
 
 function show_test_time() {
@@ -289,9 +289,9 @@ function do_cpu_test() {
     echo "${WHITE}"
     TESTCOUNT=$((TESTCOUNT+1))
     title "${TESTCOUNT}. CPU Performance Test - Host OS "
-    show_test_cmd  " [ sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --cpu-max-prime=${CPU_MAX_PRIME} --test=cpu run ]${WHITE}"
+    show_test_cmd  " [ sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --cpu-max-prime=${_CPU_MAX_PRIME} --test=cpu run ]${WHITE}"
     if [ "${DRY_RUN}" != "true" ];then
-      sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --cpu-max-prime=${CPU_MAX_PRIME} --test=cpu run
+      sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --cpu-max-prime=${_CPU_MAX_PRIME} --test=cpu run
     fi
     show_test_time "host - cpu"
   fi
@@ -300,9 +300,9 @@ function do_cpu_test() {
     echo "${GREEN}"
     TESTCOUNT=$((TESTCOUNT+1))
     title "${TESTCOUNT}. CPU Performance Test - Docker"
-    show_test_cmd  " [ docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --cpu-max-prime=${CPU_MAX_PRIME} --test=cpu run ]${GREEN}"
+    show_test_cmd  " [ docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --cpu-max-prime=${_CPU_MAX_PRIME} --test=cpu run ]${GREEN}"
     if [ "${DRY_RUN}" != "true" ];then
-      docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --cpu-max-prime=${CPU_MAX_PRIME} --test=cpu run
+      docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --cpu-max-prime=${_CPU_MAX_PRIME} --test=cpu run
     fi
     show_test_time "docker - cpu"
   fi
@@ -315,9 +315,9 @@ function do_cpu_test() {
     if [ "${CONTAINER_ID}" == " " ];then
       echo "hyper container not exist, exit!" && exit 1
     fi
-    show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} /usr/local/bin/sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --cpu-max-prime=${CPU_MAX_PRIME} --test=cpu run ]${BLUE}"
+    show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} /usr/local/bin/sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --cpu-max-prime=${_CPU_MAX_PRIME} --test=cpu run ]${BLUE}"
     if [ "${DRY_RUN}" != "true" ];then
-      sudo hyper exec ${CONTAINER_ID} /usr/local/bin/sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --cpu-max-prime=${CPU_MAX_PRIME} --test=cpu run
+      sudo hyper exec ${CONTAINER_ID} /usr/local/bin/sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --cpu-max-prime=${_CPU_MAX_PRIME} --test=cpu run
     fi
     show_test_time "hyper - cpu"
   fi
@@ -336,9 +336,9 @@ function do_memory_test() {
         echo "${WHITE}"
         TESTCOUNT=$((TESTCOUNT+1))
         title "${TESTCOUNT}. Memory Test: $mode $oper - Host OS"
-        show_test_cmd  " [ sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run ]${WHITE}"
+        show_test_cmd  " [ sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run ]${WHITE}"
         if [ "${DRY_RUN}" != "true" ];then
-          sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run
+          sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run
         fi
         show_test_time "host - mem - ${mode} ${oper}"
       fi
@@ -347,9 +347,9 @@ function do_memory_test() {
         echo "${GREEN}"
         TESTCOUNT=$((TESTCOUNT+1))
         title "${TESTCOUNT}. Memory Test: $mode $oper - Docker"
-        show_test_cmd  " [ docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run ]${GREEN}"
+        show_test_cmd  " [ docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run ]${GREEN}"
         if [ "${DRY_RUN}" != "true" ];then
-          docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run
+          docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run
         fi
         show_test_time "docker - mem - ${mode} ${oper}"
       fi
@@ -362,9 +362,9 @@ function do_memory_test() {
         if [ "${CONTAINER_ID}" == " " ];then
           echo "hyper container not exist, exit!" && exit 1
         fi
-        show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} /usr/local/bin/sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run ]${BLUE}"
+        show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} /usr/local/bin/sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run ]${BLUE}"
         if [ "${DRY_RUN}" != "true" ];then
-          sudo hyper exec ${CONTAINER_ID} /usr/local/bin/sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run
+          sudo hyper exec ${CONTAINER_ID} /usr/local/bin/sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run
         fi
         show_test_time "hyper - mem - ${mode} ${oper}"
       fi
@@ -374,7 +374,7 @@ function do_memory_test() {
 }
 
 function iotest_cmd() {
-  echo "/usr/local/bin/sysbench --test=fileio prepare && /usr/local/bin/sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --file-test-mode=$1 --test=fileio run; /usr/local/bin/sysbench --test=fileio cleanup"
+  echo "/usr/local/bin/sysbench --test=fileio prepare && /usr/local/bin/sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --file-test-mode=$1 --test=fileio run; /usr/local/bin/sysbench --test=fileio cleanup"
 }
 
 function do_io_test() {
@@ -409,13 +409,13 @@ function do_io_test() {
       TESTCOUNT=$((TESTCOUNT+1))
       title "${TESTCOUNT}. I/O Test $io_test - Hyper"
       CONTAINER_ID=$(hyper_get_container_id)
-      echo "CONTAINER_ID:[$CONTAINER_ID]"
+      #echo "CONTAINER_ID:[$CONTAINER_ID]"
       if [ "${CONTAINER_ID}" == " " ];then
         echo "hyper container not exist, exit!" && exit 1
       fi
-      show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} /bin/bash -c \"/root/test/io.sh ${NUM_THREADS} ${MAX_REQUESTS} ${io_test}\" ]${BLUE}"
+      show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} /bin/bash -c \"/root/test/io.sh ${_NUM_THREADS} ${_MAX_REQUESTS} ${io_test}\" ]${BLUE}"
       if [ "${DRY_RUN}" != "true" ];then
-        sudo hyper exec ${CONTAINER_ID} /bin/bash -c "/root/test/io.sh ${NUM_THREADS} ${MAX_REQUESTS} ${io_test}"
+        sudo hyper exec ${CONTAINER_ID} /bin/bash -c "/root/test/io.sh ${_NUM_THREADS} ${_MAX_REQUESTS} ${io_test}"
       fi
       show_test_time "hyper - io - ${io_test}"
     fi
