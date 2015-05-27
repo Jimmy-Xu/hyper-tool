@@ -190,11 +190,11 @@ function generate_test_parameter() {
 
   #sysbench cpu test parameter
   _NUM_THREADS=${CPU_NUM}
-  _MAX_REQUESTS=$((CPU_NUM*1000))
-  _CPU_MAX_PRIME=$((CPU_NUM*1000))
+  _MAX_REQUESTS=$((CPU_NUM*10000))
+  _CPU_MAX_PRIME=$((CPU_NUM*10000))
 
   #sysbench mem test parameter
-  _DATA_SIZE=$((CPU_NUM*10))
+  _DATA_SIZE=$((CPU_NUM*20))
 
   #sysbench io test parameter
   _FILE_SIZE=$((CPU_NUM/4))
