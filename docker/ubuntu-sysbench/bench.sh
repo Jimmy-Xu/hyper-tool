@@ -5,8 +5,8 @@
 #######################################
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 JQ=${BASE_DIR}/../../util/jq
-DRY_RUN="true"
-#DRY_RUN="false"
+#DRY_RUN="true"
+DRY_RUN="false"
 
 #######################################
 # Parameter
@@ -195,6 +195,14 @@ function generate_test_parameter() {
 
   #sysbench mem test parameter
   _DATA_SIZE=$((CPU_NUM*10))
+
+  #sysbench io test parameter
+  _FILE_SIZE=$((CPU_NUM/4))
+  if [ ${_FILE_SIZE} -eq 0 ];then
+    _FILE_SIZE=512
+  else
+    _FILE_SIZE=$((_FILE_SIZE*1024))
+  fi
 }
 
 
@@ -228,6 +236,10 @@ function show_test_parameter() {
 
   echo "-------- memory test parameter---------"
   echo " _DATA_SIZE : ${WHITE}${_DATA_SIZE}${CYAN} (GB)"
+
+  echo "---------- io test parameter-----------"
+  echo " _FILE_SIZE : ${WHITE}${_FILE_SIZE}${CYAN} (MB)"
+
 
   #check parameter
   if [ -z "${CPU_NUM}" -o -z "${MEMORY_SIZE}" -o -z "${DOCKER_IMAGE}" -o -z "${CPU_SET}" -o -z "${_NUM_THREADS}" -o -z "${_MAX_REQUESTS}" -o -z "${_CPU_MAX_PRIME}" -o -z "${_DATA_SIZE}" ];then
@@ -325,6 +337,7 @@ function do_cpu_test() {
     if [ "${DRY_RUN}" != "true" ];then
       sudo hyper exec ${CONTAINER_ID} /usr/local/bin/sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --cpu-max-prime=${_CPU_MAX_PRIME} --test=cpu run
     fi
+    #hyper run ${DOCKER_IMAGE} /usr/local/bin/sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --cpu-max-prime=${_CPU_MAX_PRIME} --test=cpu run
     show_test_time "hyper - cpu"
   fi
   echo "${RESET}"
@@ -372,6 +385,7 @@ function do_memory_test() {
         if [ "${DRY_RUN}" != "true" ];then
           sudo hyper exec ${CONTAINER_ID} /usr/local/bin/sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} --memory-total-size=${_DATA_SIZE}G run
         fi
+        #sudo hyper run ${DOCKER_IMAGE} /usr/local/bin/sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} --memory-total-size=${_DATA_SIZE}G run
         show_test_time "hyper - mem - ${mode} ${oper}"
       fi
       echo "${RESET}"
@@ -380,7 +394,7 @@ function do_memory_test() {
 }
 
 function iotest_cmd() {
-  echo "/usr/local/bin/sysbench --test=fileio prepare && /usr/local/bin/sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --file-test-mode=$1 --test=fileio run; /usr/local/bin/sysbench --test=fileio cleanup"
+  echo "/usr/local/bin/sysbench --test=fileio prepare && /usr/local/bin/sysbench --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --file-test-mode=$1 --test=fileio --file-total-size=${_FILE_SIZE}M run; /usr/local/bin/sysbench --test=fileio cleanup"
 }
 
 function do_io_test() {
@@ -421,8 +435,9 @@ function do_io_test() {
       fi
       show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} /bin/bash -c \"/root/test/io.sh ${_NUM_THREADS} ${_MAX_REQUESTS} ${io_test}\" ]${BLUE}"
       if [ "${DRY_RUN}" != "true" ];then
-        sudo hyper exec ${CONTAINER_ID} /bin/bash -c "/root/test/io.sh ${_NUM_THREADS} ${_MAX_REQUESTS} ${io_test}"
+        sudo hyper exec ${CONTAINER_ID} /bin/bash -c "/root/test/io.sh ${_NUM_THREADS} ${_MAX_REQUESTS} ${_FILE_SIZE} ${io_test}"
       fi
+      #sudo hyper run ${DOCKER_IMAGE} /bin/bash -c "/root/test/io.sh ${_NUM_THREADS} ${_MAX_REQUESTS} ${_FILE_SIZE} ${io_test}"
       show_test_time "hyper - io - ${io_test}"
     fi
     echo "${RESET}"
