@@ -5,8 +5,8 @@
 #######################################
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 JQ=${BASE_DIR}/../../util/jq
-#DRY_RUN="true"
-DRY_RUN="false"
+DRY_RUN="true"
+#DRY_RUN="false"
 
 #######################################
 # Parameter
@@ -302,7 +302,6 @@ function show_test_time() {
 
 function do_cpu_test() {
   TEST_TARGET=("$1")
-
   if (echo "${TEST_TARGET[@]}" | grep -w "host" &>/dev/null);then
     echo "${WHITE}"
     TESTCOUNT=$((TESTCOUNT+1))
@@ -346,7 +345,6 @@ function do_cpu_test() {
 
 function do_memory_test() {
   TEST_TARGET=("$1")
-
   for oper in read write
   do
     for mode in seq rnd
@@ -373,7 +371,7 @@ function do_memory_test() {
         show_test_time "docker - mem - ${mode} ${oper}"
       fi
 
-      if (echo "${TEST_TARGET[@]}" | grep -w "docker" &>/dev/null);then
+      if (echo "${TEST_TARGET[@]}" | grep -w "hyper" &>/dev/null);then
         echo "${BLUE}"
         TESTCOUNT=$((TESTCOUNT+1))
         title "${TESTCOUNT}. Memory Test: $mode $oper - Hyper"
@@ -424,7 +422,7 @@ function do_io_test() {
       show_test_time "docker - io - ${io_test}"
     fi
 
-    if (echo "${TEST_TARGET[@]}" | grep -w "docker" &>/dev/null);then
+    if (echo "${TEST_TARGET[@]}" | grep -w "hyper" &>/dev/null);then
       echo "${BLUE}"
       TESTCOUNT=$((TESTCOUNT+1))
       title "${TESTCOUNT}. I/O Test $io_test - Hyper"
