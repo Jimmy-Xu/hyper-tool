@@ -209,8 +209,8 @@ function show_test_parameter() {
   title "List all test parameter"
 
   echo "----------- total resource -----------"
-  echo " TOTAL_MEMSIZE : ${WHITE}${TOTAL_MEMSIZE}${CYAN} (MB)"
   echo " TOTAL_CPUNUM  : ${WHITE}${TOTAL_CPUNUM}${CYAN}"
+  echo " TOTAL_MEMSIZE : ${WHITE}${TOTAL_MEMSIZE}${CYAN} (MB)"
   echo
 
   echo "---------- resource to test ----------"
