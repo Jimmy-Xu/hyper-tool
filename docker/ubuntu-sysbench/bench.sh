@@ -5,7 +5,8 @@
 #######################################
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 JQ=${BASE_DIR}/../../util/jq
-DRY_RUN="true" #true|false
+#DRY_RUN="true"
+DRY_RUN="false"
 
 #######################################
 # Parameter
@@ -271,7 +272,7 @@ function start_test() {
 function show_test_cmd() {
   START_TS=$( date +"%s" )
   START_TIME=$( date +"%F %T" )
-  echo " ${YELLOW}$1 "
+  echo " ${YELLOW} test command line : $1 "
 }
 
 function show_test_time() {
@@ -299,9 +300,9 @@ function do_cpu_test() {
     echo "${GREEN}"
     TESTCOUNT=$((TESTCOUNT+1))
     title "${TESTCOUNT}. CPU Performance Test - Docker"
-    show_test_cmd  " [ docker run -t -m=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --cpu-max-prime=${CPU_MAX_PRIME} --test=cpu run ]${GREEN}"
+    show_test_cmd  " [ docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --cpu-max-prime=${CPU_MAX_PRIME} --test=cpu run ]${GREEN}"
     if [ "${DRY_RUN}" != "true" ];then
-      docker run -t -m=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --cpu-max-prime=${CPU_MAX_PRIME} --test=cpu run
+      docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --cpu-max-prime=${CPU_MAX_PRIME} --test=cpu run
     fi
     show_test_time "docker - cpu"
   fi
@@ -346,9 +347,9 @@ function do_memory_test() {
         echo "${GREEN}"
         TESTCOUNT=$((TESTCOUNT+1))
         title "${TESTCOUNT}. Memory Test: $mode $oper - Docker"
-        show_test_cmd  " [ docker run -t -m=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run ]${GREEN}"
+        show_test_cmd  " [ docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run ]${GREEN}"
         if [ "${DRY_RUN}" != "true" ];then
-          docker run -t -m=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run
+          docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} sysbench --num-threads=${NUM_THREADS} --max-requests=${MAX_REQUESTS} --test=memory --memory-oper=${oper} --memory-access-mode=${mode} run
         fi
         show_test_time "docker - mem - ${mode} ${oper}"
       fi
@@ -396,9 +397,9 @@ function do_io_test() {
       echo "${GREEN}"
       TESTCOUNT=$((TESTCOUNT+1))
       title "${TESTCOUNT}. I/O Test $io_test - Docker"
-      show_test_cmd  " [ docker run -t -m=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} bash -c \"$(iotest_cmd $io_test)\" ]${GREEN}"
+      show_test_cmd  " [ docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} bash -c \"$(iotest_cmd $io_test)\" ]${GREEN}"
       if [ "${DRY_RUN}" != "true" ];then
-        docker run -t -m=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} bash -c "$(iotest_cmd $io_test)"
+        docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET/ /,} ${DOCKER_IMAGE} bash -c "$(iotest_cmd $io_test)"
       fi
       show_test_time "docker - io - ${io_test}"
     fi
