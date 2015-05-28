@@ -6,8 +6,13 @@
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 JQ=${BASE_DIR}/../../util/jq
 SYSBENCH=$(which sysbench)
-DRY_RUN="true"
-#DRY_RUN="false"
+
+#for dev
+#DRY_RUN="true"
+DRY_RUN="false"
+
+#EXEC_MODE="live"
+EXEC_MODE="dev"
 
 #######################################
 # Parameter
@@ -50,15 +55,27 @@ function generate_test_case() {
   CPU_SET=($(seq 0 $((CPU_NUM-1))))
   CPU_SET="${CPU_SET[@]}"
 
-  #test case
-  #--max-requests(10000*), --percentile(95*), --num-threads(1*), --cpu-max-prime
-  SYS_CPU_CASE=( "${MAX_REQUESTS} 95 1 10000"  "${MAX_REQUESTS} 95 ${CPU_NUM} 50000" )
+  if [ ${EXEC_MODE} == "live"  ];then
+    #test case for live(normal test)
+    #--max-requests(10000*), --percentile(95*), --num-threads(1*), --cpu-max-prime
+    SYS_CPU_CASE=( "${MAX_REQUESTS} 95 1 10000"  "${MAX_REQUESTS} 95 ${CPU_NUM} 50000" )
 
-  #--max-requests(10000*), --percentile(95*), --num-threads(1*), --memory-scope(global*|local), --memory-total-size(100G*)
-  SYS_MEM_CASE=( "${MAX_REQUESTS} 100 1 local 100G"  "${MAX_REQUESTS} 100 ${CPU_NUM} local 200G" )
+    #--max-requests(10000*), --percentile(95*), --num-threads(1*), --memory-scope(global*|local), --memory-total-size(100G*)
+    SYS_MEM_CASE=( "${MAX_REQUESTS} 100 1 local 100G"  "${MAX_REQUESTS} 100 ${CPU_NUM} local 200G" )
 
-  #--max-requests(10000*), --percentile(95*), --num-threads(1*), --file-total-size(2G), --file-block-size(16384*), --file-num(128*)
-  SYS_IO_CASE=( "${MAX_REQUESTS} 95 1 1G $((16*1024)) 128"  "${MAX_REQUESTS} 95 ${CPU_NUM} 2G $((1024*1024)) 64" )
+    #--max-requests(10000*), --percentile(95*), --num-threads(1*), --file-total-size(2G), --file-block-size(16384*), --file-num(128*)
+    SYS_IO_CASE=( "${MAX_REQUESTS} 95 1 1G $((16*1024)) 128"  "${MAX_REQUESTS} 95 ${CPU_NUM} 2G $((1024*1024)) 64" )
+  else
+    #test case for dev(fast test)
+    #--max-requests(10000*), --percentile(95*), --num-threads(1*), --cpu-max-prime
+    SYS_CPU_CASE=( "${MAX_REQUESTS} 95 1 1000"  "${MAX_REQUESTS} 95 ${CPU_NUM} 5000" )
+
+    #--max-requests(10000*), --percentile(95*), --num-threads(1*), --memory-scope(global*|local), --memory-total-size(100G*)
+    SYS_MEM_CASE=( "${MAX_REQUESTS} 100 1 local 10G"  "${MAX_REQUESTS} 100 ${CPU_NUM} local 20G" )
+
+    #--max-requests(10000*), --percentile(95*), --num-threads(1*), --file-total-size(2G), --file-block-size(16384*), --file-num(128*)
+    SYS_IO_CASE=( "${MAX_REQUESTS} 95 1 4M $((16*1024)) 1"  "${MAX_REQUESTS} 95 ${CPU_NUM} 8M $((1024*1024)) 4" )
+  fi
 }
 
 function title() {
@@ -254,10 +271,10 @@ function input_max_requests() {
 
   SET_REQUEST_DONE="false"
   until [[ "${SET_REQUEST_DONE}" == "true" ]];do
-    echo -e -n "\n${BOLD}${PURPLE}Please input the ${WHITE}max number${PURPLE} of requests${RESET}(MB)(>=10000,press 'Enter' for ${MAX_REQUESTS}):"
+    echo -e -n "\n${BOLD}${PURPLE}Please input the ${WHITE}max number${PURPLE} of requests${RESET}(MB)(>=1000,press 'Enter' for ${MAX_REQUESTS}):"
     read CHOICE
     if [ ! -z ${CHOICE} ];then
-      if [[ $CHOICE =~ ^[[:digit:]]+$ ]] && [[ ${CHOICE} -ge 10000 ]];then
+      if [[ $CHOICE =~ ^[[:digit:]]+$ ]] && [[ ${CHOICE} -ge 1000 ]];then
         MAX_REQUESTS=${CHOICE}
         SET_REQUEST_DONE="true"
       else
@@ -297,6 +314,8 @@ function start_test() {
 
   TESTCOUNT=0
 
+  TEST_START_TS=$( date +"%s" )
+  TEST_START_TIME=$( date +"%F %T" )
   #3 start test
   if (echo "${TEST_ITEM[@]}" | grep -w "cpu" &>/dev/null);then
     do_cpu_test "${TEST_TARGET}"
@@ -307,6 +326,12 @@ function start_test() {
   if (echo "${TEST_ITEM[@]}" | grep -w "io" &>/dev/null);then
     do_io_test "${TEST_TARGET}"
   fi
+  TEST_END_TS=$( date +"%s" )
+  TEST_END_TIME=$( date +"%F %T" )
+  echo
+  echo "Test Start: ${START_TIME}"
+  echo "Test End  : ${END_TIME}"
+  echo "Test Duration: $((TEST_END_TS - TEST_START_TS)) (sec)"
 }
 
 
@@ -321,7 +346,7 @@ function show_test_time() {
   END_TIME=$( date +"%F %T" )
   TEST_NAME="$1"
   TEST_CASE="$2"
-  echo -e "\n${LIGHT}${GREEN}[ ${TEST_NAME} - ${TEST_CASE} ]: ${START_TIME} - ${END_TIME} : $((END_TS - START_TS)) (seconds)\n${RESET}"
+  echo -e "${LIGHT}${GREEN}[ ${TEST_NAME} - ${TEST_CASE} ]: ${START_TIME} - ${END_TIME} : $((END_TS - START_TS)) (seconds)\n${RESET}"
 }
 
 function cputest_cmd() {
@@ -479,7 +504,7 @@ function do_memory_test() {
 }
 
 function iotest_cmd() {
-  echo "${SYSBENCH} --test=fileio --file-total-size=$4 prepare && \
+  echo "${SYSBENCH} --test=fileio --file-total-size=$4 --file-num=$6 prepare && \
   ${SYSBENCH} --test=fileio --max-requests=$1 --percentile=$2 --num-threads=$3 --file-total-size=$4 --file-block-size=$5 --file-num=$6 --file-test-mode=$7 run; \
   ${SYSBENCH} --test=fileio --file-total-size=$4 cleanup"
 }
@@ -515,6 +540,7 @@ function do_io_test() {
         echo "${WHITE}"
         TESTCOUNT=$((TESTCOUNT+1))
         title "${TESTCOUNT}. I/O Test - ${test_mode} - host"
+        echo "test_case: ${test_case}"
         show_test_cmd  " [ bash -c \"${TEST_CMD}\" ]${WHITE}"
         if [ "${DRY_RUN}" != "true" ];then
           bash -c "${TEST_CMD}"
@@ -527,6 +553,7 @@ function do_io_test() {
         echo "${GREEN}"
         TESTCOUNT=$((TESTCOUNT+1))
         title "${TESTCOUNT}. I/O Test - ${test_mode} - docker"
+        echo "test_case: ${test_case}"
         show_test_cmd  " [ docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET// /,} ${DOCKER_IMAGE} bash -c \"${TEST_CMD}\" ]${GREEN}"
         if [ "${DRY_RUN}" != "true" ];then
           docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET// /,} ${DOCKER_IMAGE} bash -c "${TEST_CMD}"
@@ -539,6 +566,7 @@ function do_io_test() {
         echo "${BLUE}"
         TESTCOUNT=$((TESTCOUNT+1))
         title "${TESTCOUNT}. I/O Test - ${test_mode} - hyper"
+        echo "test_case: ${test_case}"
         CONTAINER_ID=$(hyper_get_container_id)
         #echo "CONTAINER_ID:[$CONTAINER_ID]"
         if [ "${CONTAINER_ID}" == " " ];then
