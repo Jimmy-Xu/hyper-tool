@@ -11,3 +11,7 @@ cat ${LOG_DIR}/${LOG_FILE} | grep -A24 "CPU Performance Test -" | awk -f ${AWK_D
 echo
 
 cat ${LOG_DIR}/${LOG_FILE} | grep -A26 "Memory Test -" | awk -f ${AWK_DIR}/mem_report.awk
+
+echo
+
+cat ${LOG_DIR}/${LOG_FILE} | grep -A40 "IO Test -" | awk -f ${AWK_DIR}/io_report.awk

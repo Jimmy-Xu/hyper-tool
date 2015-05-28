@@ -8,8 +8,8 @@ JQ=${BASE_DIR}/../../util/jq
 SYSBENCH=$(which sysbench)
 
 #for dev
-DRY_RUN="true"
-#DRY_RUN="false"
+#DRY_RUN="true"
+DRY_RUN="false"
 
 EXEC_MODE="live"
 #EXEC_MODE="dev"
@@ -539,7 +539,7 @@ function do_memory_test() {
 }
 
 function iotest_cmd() {
-  echo "${SYSBENCH} --test=fileio --file-total-size=$4 --file-num=$6 prepare && \
+  echo "${SYSBENCH} --test=fileio --file-total-size=$4 --file-num=$6 prepare >/dev/null 2>&1 && \
   ${SYSBENCH} --test=fileio --max-requests=$1 --percentile=$2 --num-threads=$3 --file-total-size=$4 --file-block-size=$5 --file-num=$6 --file-test-mode=$7 run; \
   ${SYSBENCH} --test=fileio --file-total-size=$4 cleanup"
 }
@@ -574,7 +574,7 @@ function do_io_test() {
       if (echo "${TEST_TARGET[@]}" | grep -w "host" &>/dev/null);then
         echo "${WHITE}"
         TESTCOUNT=$((TESTCOUNT+1))
-        title "${TESTCOUNT}. I/O Test - ${test_mode} - host"
+        title "${TESTCOUNT}. IO Test - ${test_mode} - host"
         echo "test_case: ${test_case// /-}"
         show_test_cmd  " [ bash -c \"${TEST_CMD}\" ]${WHITE}"
         if [ "${DRY_RUN}" != "true" ];then
@@ -587,7 +587,7 @@ function do_io_test() {
       if (echo "${TEST_TARGET[@]}" | grep -w "docker" &>/dev/null);then
         echo "${GREEN}"
         TESTCOUNT=$((TESTCOUNT+1))
-        title "${TESTCOUNT}. I/O Test - ${test_mode} - docker"
+        title "${TESTCOUNT}. IO Test - ${test_mode} - docker"
         echo "test_case: ${test_case// /-}"
         show_test_cmd  " [ docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET// /,} ${DOCKER_IMAGE} bash -c \"${TEST_CMD}\" ]${GREEN}"
         if [ "${DRY_RUN}" != "true" ];then
@@ -600,7 +600,7 @@ function do_io_test() {
       if (echo "${TEST_TARGET[@]}" | grep -w "hyper" &>/dev/null);then
         echo "${BLUE}"
         TESTCOUNT=$((TESTCOUNT+1))
-        title "${TESTCOUNT}. I/O Test - ${test_mode} - hyper"
+        title "${TESTCOUNT}. IO Test - ${test_mode} - hyper"
         echo "test_case: ${test_case// /-}"
         CONTAINER_ID=$(hyper_get_container_id)
         #echo "CONTAINER_ID:[$CONTAINER_ID]"
