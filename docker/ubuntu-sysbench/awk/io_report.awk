@@ -3,7 +3,7 @@
 BEGIN{
 }
 /CPU Performance Test/{
-  target=$6" | cpu"
+  target=$6
 }
 /^test_case: /{
   test_case=$2
@@ -32,8 +32,8 @@ BEGIN{
   f_max[key]=$2
 }
 END{
-  print "| target | item | test-case | threads | primer | time(sec) | min(ms) | avg(ms) | max(ms) |"
-  print "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"
+  print "| - | test-case | threads | primer | time(sec) | min(ms) | avg(ms) | max(ms) |"
+  print "| --- | --- | --- | --- | --- | --- | --- | --- |"
   for ( i in f_time ){
     printf "| %-6s | %s | %s | %s | %s | %s | %s |\n", i, f_threads[i], f_primer[i], f_time[i], f_min[i], f_avg[i], f_max[i]
   }
