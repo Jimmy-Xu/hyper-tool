@@ -414,7 +414,7 @@ function do_cpu_test() {
       echo "${WHITE}"
       TESTCOUNT=$((TESTCOUNT+1))
       title "${TESTCOUNT}. CPU Performance Test - host "
-      echo "test_case: ${test_case}"
+      echo "test_case: ${test_case// /-}"
       show_test_cmd  " [ bash -c \"${TEST_CMD}\" ]${WHITE}"
       if [ "${DRY_RUN}" != "true" ];then
         bash -c "${TEST_CMD}"
@@ -427,7 +427,7 @@ function do_cpu_test() {
       echo "${GREEN}"
       TESTCOUNT=$((TESTCOUNT+1))
       title "${TESTCOUNT}. CPU Performance Test - docker"
-      echo "test_case: ${test_case}"
+      echo "test_case: ${test_case// /-}"
       show_test_cmd  " [ docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET// /,} ${DOCKER_IMAGE} ${TEST_CMD} ]${WHITE}"
       if [ "${DRY_RUN}" != "true" ];then
         docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET// /,} ${DOCKER_IMAGE} ${TEST_CMD}
@@ -440,7 +440,7 @@ function do_cpu_test() {
       echo "${BLUE}"
       TESTCOUNT=$((TESTCOUNT+1))
       title "${TESTCOUNT}. CPU Performance Test - hyper"
-      echo "test_case: ${test_case}"
+      echo "test_case: ${test_case// /-}"
       CONTAINER_ID=$(hyper_get_container_id)
       if [ "${CONTAINER_ID}" == " " ];then
         echo "hyper container not exist, exit!" && exit 1
@@ -494,7 +494,7 @@ function do_memory_test() {
           echo "${WHITE}"
           TESTCOUNT=$((TESTCOUNT+1))
           title "${TESTCOUNT}. Memory Test - $mode $oper - host"
-          echo "test_case: ${test_case}"
+          echo "test_case: ${test_case// /-}"
           show_test_cmd  " [ bash -c \"${TEST_CMD}\" ]${WHITE}"
           if [ "${DRY_RUN}" != "true" ];then
             bash -c "${TEST_CMD}"
@@ -507,7 +507,7 @@ function do_memory_test() {
           echo "${GREEN}"
           TESTCOUNT=$((TESTCOUNT+1))
           title "${TESTCOUNT}. Memory Test - $mode $oper - docker"
-          echo "test_case: ${test_case}"
+          echo "test_case: ${test_case// /-}"
           show_test_cmd  " [ docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET// /,} ${DOCKER_IMAGE} ${TEST_CMD} ]${WHITE}"
           if [ "${DRY_RUN}" != "true" ];then
             docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET// /,} ${DOCKER_IMAGE} ${TEST_CMD}
@@ -520,7 +520,7 @@ function do_memory_test() {
           echo "${BLUE}"
           TESTCOUNT=$((TESTCOUNT+1))
           title "${TESTCOUNT}. Memory Test - $mode $oper - hyper"
-          echo "test_case: ${test_case}"
+          echo "test_case: ${test_case// /-}"
           CONTAINER_ID=$(hyper_get_container_id)
           if [ "${CONTAINER_ID}" == " " ];then
             echo "hyper container not exist, exit!" && exit 1
@@ -575,7 +575,7 @@ function do_io_test() {
         echo "${WHITE}"
         TESTCOUNT=$((TESTCOUNT+1))
         title "${TESTCOUNT}. I/O Test - ${test_mode} - host"
-        echo "test_case: ${test_case}"
+        echo "test_case: ${test_case// /-}"
         show_test_cmd  " [ bash -c \"${TEST_CMD}\" ]${WHITE}"
         if [ "${DRY_RUN}" != "true" ];then
           bash -c "${TEST_CMD}"
@@ -588,7 +588,7 @@ function do_io_test() {
         echo "${GREEN}"
         TESTCOUNT=$((TESTCOUNT+1))
         title "${TESTCOUNT}. I/O Test - ${test_mode} - docker"
-        echo "test_case: ${test_case}"
+        echo "test_case: ${test_case// /-}"
         show_test_cmd  " [ docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET// /,} ${DOCKER_IMAGE} bash -c \"${TEST_CMD}\" ]${GREEN}"
         if [ "${DRY_RUN}" != "true" ];then
           docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET// /,} ${DOCKER_IMAGE} bash -c "${TEST_CMD}"
@@ -601,7 +601,7 @@ function do_io_test() {
         echo "${BLUE}"
         TESTCOUNT=$((TESTCOUNT+1))
         title "${TESTCOUNT}. I/O Test - ${test_mode} - hyper"
-        echo "test_case: ${test_case}"
+        echo "test_case: ${test_case// /-}"
         CONTAINER_ID=$(hyper_get_container_id)
         #echo "CONTAINER_ID:[$CONTAINER_ID]"
         if [ "${CONTAINER_ID}" == " " ];then
@@ -620,6 +620,22 @@ function do_io_test() {
 }
 
 
+function show_usage() {
+  cat <<COMMENT
+
+usage:
+    ./bench.sh init   #build Dockerfile for hyper:sysbench
+  or
+    ./bench.sh clean  #clean old pod and container
+  or
+    ./bench.sh test   #start all test
+  or
+    ./bench.sh test "host docker hyper" "cpu mem io"
+
+COMMENT
+  exit 1
+}
+
 
 ######################################################################
 # main
@@ -636,21 +652,12 @@ if [ $# -eq 1 ]; then
   elif [ "$1" == "test" ]; then
     echo "[ full test ]"
     start_test "host docker hyper" "cpu mem io"
+  else
+    show_usage
   fi
 elif [ $# -eq 3 -a "$1" == "test" ]; then
   echo "[ specified test ]"
   start_test "$2" "$3"
 else
-  cat <<COMMENT
-
-usage:
-    ./bench.sh init   #build Dockerfile for hyper:sysbench
-  or
-    ./bench.sh clean  #clean old pod and container
-  or
-    ./bench.sh test   #start all test
-  or
-    ./bench.sh test "host docker hyper" "cpu mem io"
-
-COMMENT
+  show_usage
 fi
