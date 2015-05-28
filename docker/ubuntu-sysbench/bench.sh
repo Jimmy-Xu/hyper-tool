@@ -8,11 +8,11 @@ JQ=${BASE_DIR}/../../util/jq
 SYSBENCH=$(which sysbench)
 
 #for dev
-DRY_RUN="true"
-#DRY_RUN="false"
+#DRY_RUN="true"
+DRY_RUN="false"
 
-#EXEC_MODE="live"
-EXEC_MODE="dev"
+EXEC_MODE="live"
+#EXEC_MODE="dev"
 
 #######################################
 # Parameter
@@ -61,7 +61,7 @@ function generate_test_case() {
     SYS_CPU_CASE=( "${MAX_REQUESTS} 95 1 10000"  "${MAX_REQUESTS} 95 ${CPU_NUM} 50000" )
 
     #--max-requests(10000*), --percentile(95*), --num-threads(1*), --memory-scope(global*|local), --memory-total-size(100G*)
-    SYS_MEM_CASE=( "${MAX_REQUESTS} 95 1 global 100G"  "${MAX_REQUESTS} 95 ${CPU_NUM} global 200G" )
+    SYS_MEM_CASE=( "${MAX_REQUESTS} 95 1 global 10G"  "${MAX_REQUESTS} 95 ${CPU_NUM} global 20G" )
 
     #--max-requests(10000*), --percentile(95*), --num-threads(1*), --file-total-size(2G), --file-block-size(16384*), --file-num(128*)
     SYS_IO_CASE=( "${MAX_REQUESTS} 95 1 1G $((16*1024)) 128"  "${MAX_REQUESTS} 95 ${CPU_NUM} 2G $((1024*1024)) 64" )
@@ -637,9 +637,13 @@ usage:
   or
     ./bench.sh clean  #clean old pod and container
   or
-    ./bench.sh test   #start all test
+    ./bench.sh run   #start all test
   or
-    ./bench.sh test "host docker hyper" "cpu mem io"
+    ./bench.sh dry-run   #start all test
+  or
+    ./bench.sh run "host docker hyper" "cpu mem io"
+  or
+    ./bench.sh dry-run "host docker hyper" "cpu mem io"
 
 COMMENT
   exit 1
@@ -658,15 +662,24 @@ if [ $# -eq 1 ]; then
     clean_pod
     echo -e "\n===============================================================================================\n"
     clean_docker
-  elif [ "$1" == "test" ]; then
+  elif [ "$1" == "run" ]; then
     echo "[ full test ]"
+    start_test "host docker hyper" "cpu mem io"
+  elif [ "$1" == "dry-run" ]; then
+    echo "[ full dry-run test ]"
+    DRY_RUN="true"
     start_test "host docker hyper" "cpu mem io"
   else
     show_usage
   fi
-elif [ $# -eq 3 -a "$1" == "test" ]; then
+elif [ $# -eq 3 -a "$1" == "run" ]; then
   echo "[ specified test ]"
   start_test "$2" "$3"
+elif [ $# -eq 3 -a "$1" == "dry-run" ]; then
+  echo "[ specified dry test ]"
+  DRY_RUN="true"
+  start_test "$2" "$3"
 else
+
   show_usage
 fi
