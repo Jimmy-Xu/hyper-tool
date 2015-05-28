@@ -461,7 +461,8 @@ function do_cpu_test() {
 
 
 function memtest_cmd() {
-  echo "${SYSBENCH} --test=memory --max-requests=$1 --percentile=$2 --num-threads=$3 --memory-scope=$4 --memory-total-size=$5 --memory-block-size=$6 --memory-oper=$7 --memory-access-mode=$8 run"
+  echo "${SYSBENCH} --test=memory --num-threads=$3 --memory-block-size=1M --memory-total-size=10G run"
+  #echo "${SYSBENCH} --test=memory --max-requests=$1 --percentile=$2 --num-threads=$3 --memory-scope=$4 --memory-total-size=$5 --memory-block-size=$6 --memory-oper=$7 --memory-access-mode=$8 run"
 }
 
 function do_memory_test() {
