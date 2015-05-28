@@ -11,8 +11,8 @@ SYSBENCH=$(which sysbench)
 #DRY_RUN="true"
 DRY_RUN="false"
 
-#EXEC_MODE="live"
-EXEC_MODE="dev"
+EXEC_MODE="live"
+#EXEC_MODE="dev"
 
 #######################################
 # Parameter
