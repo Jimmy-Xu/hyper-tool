@@ -64,7 +64,7 @@ function generate_test_case() {
     SYS_MEM_CASE=( "${MAX_REQUESTS} 95 1 global 100G 1M"  "${MAX_REQUESTS} 95 ${CPU_NUM} global 200G 1M" )
 
     #--max-requests(10000*), --percentile(95*), --num-threads(1*), --file-total-size(2G), --file-block-size(16384*), --file-num(128*)
-    SYS_IO_CASE=( "${MAX_REQUESTS} 95 1 1G $((16*1024)) 128"  "${MAX_REQUESTS} 95 ${CPU_NUM} 2G $((1024*1024)) 64" )
+    SYS_IO_CASE=( "${MAX_REQUESTS} 95 1 2G $((1024*1024)) 64"  "${MAX_REQUESTS} 95 ${CPU_NUM} 2G $((1024*1024)) 64" )
   else
     #test case for dev(fast test)
     #--max-requests(10000*), --percentile(95*), --num-threads(1*), --cpu-max-prime

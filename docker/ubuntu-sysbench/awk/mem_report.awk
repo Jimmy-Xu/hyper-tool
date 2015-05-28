@@ -13,7 +13,12 @@ BEGIN{
   key=target" | "test_case
 }
 /Number of threads/{
-  f_threads[key]=$4
+  if ( $4>1 ){
+    f_threads[key]=$4" threads"
+  }
+  else{
+    f_threads[key]=$4" thread"
+  }
 }
 / transferred /{
   f_totol_size[key]=$1
