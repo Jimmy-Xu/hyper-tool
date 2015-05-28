@@ -8,8 +8,8 @@ JQ=${BASE_DIR}/../../util/jq
 SYSBENCH=$(which sysbench)
 
 #for dev
-#DRY_RUN="true"
-DRY_RUN="false"
+DRY_RUN="true"
+#DRY_RUN="false"
 
 #EXEC_MODE="live"
 EXEC_MODE="dev"
@@ -71,7 +71,7 @@ function generate_test_case() {
     SYS_CPU_CASE=( "${MAX_REQUESTS} 95 1 1000"  "${MAX_REQUESTS} 95 ${CPU_NUM} 5000" )
 
     #--max-requests(10000*), --percentile(95*), --num-threads(1*), --memory-scope(global*|local), --memory-total-size(100G*)
-    SYS_MEM_CASE=( "${MAX_REQUESTS} 100 1 local 10G"  "${MAX_REQUESTS} 100 ${CPU_NUM} local 20G" )
+    SYS_MEM_CASE=( "${MAX_REQUESTS} 100 1 local 1G"  "${MAX_REQUESTS} 100 ${CPU_NUM} local 2G" )
 
     #--max-requests(10000*), --percentile(95*), --num-threads(1*), --file-total-size(2G), --file-block-size(16384*), --file-num(128*)
     SYS_IO_CASE=( "${MAX_REQUESTS} 95 1 4M $((16*1024)) 1"  "${MAX_REQUESTS} 95 ${CPU_NUM} 8M $((1024*1024)) 4" )
@@ -572,11 +572,11 @@ function do_io_test() {
         if [ "${CONTAINER_ID}" == " " ];then
           echo "hyper container not exist, exit!" && exit 1
         fi
-        show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} /bin/bash -c \"/root/test/io.sh ${_NUM_THREADS} ${_MAX_REQUESTS} ${)_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}\" ]${BLUE}"
+        show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} /bin/bash -c /root/test/io.sh \"${_NUM_THREADS} ${_MAX_REQUESTS} ${_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}\" ]${BLUE}"
         if [ "${DRY_RUN}" != "true" ];then
-          sudo hyper exec ${CONTAINER_ID} /bin/bash -c "/root/test/io.sh ${_NUM_THREADS} ${_MAX_REQUESTS} ${)_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}"
+          sudo hyper exec ${CONTAINER_ID} /bin/bash -c "/root/test/io.sh ${_NUM_THREADS} ${_MAX_REQUESTS} ${_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}"
         fi
-        #sudo hyper run ${DOCKER_IMAGE} /bin/bash -c /bin/bash -c "/root/test/io.sh ${_NUM_THREADS} ${_MAX_REQUESTS} ${)_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}"
+        #sudo hyper run ${DOCKER_IMAGE} /bin/bash -c /bin/bash -c "/root/test/io.sh ${_NUM_THREADS} ${_MAX_REQUESTS} ${_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}"
         show_test_time "hyper - io - ${test_mode}" "${test_case}"
       fi
       echo "${RESET}"
