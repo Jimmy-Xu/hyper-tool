@@ -213,13 +213,22 @@ function hyper_get_container_id() {
 
 function clean_pod() {
   title "Clean old pod with name ${POD_NAME}"
-  echo -e "\n1.stop all runnign ${POD_NAME}"
-  sudo hyper list | grep "${POD_NAME}.*running" | awk '{print $1}' | xargs -i sudo hyper stop {}
 
-  echo -e "\n2.rm all pending ${POD_NAME}"
-  sudo hyper list | grep "${POD_NAME}.*pending" | awk '{print $1}' | xargs -i sudo hyper rm {}
+  OLD_RUNNING_POD=$(sudo hyper list | grep "${POD_NAME}.*running"|wc -l)
+  echo "old running pod from ${DOCKER_IMAGE} : ${OLD_RUNNING_POD}"
+  if [ ${OLD_RUNNING_POD} -gt 0 ];then
+    echo -e "stop all runnign pod with name ${POD_NAME}"
+    sudo hyper list | grep "${POD_NAME}.*running" | awk '{print $1}' | xargs -i sudo hyper stop {}
+  fi
 
-  echo -e "\n3.list pod ${POD_NAME}"
+  OLD_PENDING_POD=$(sudo hyper list | grep "${POD_NAME}.*pending"|wc -l)
+  echo "old pending pod from ${DOCKER_IMAGE} : ${OLD_PENDING_POD}"
+  if [ ${OLD_PENDING_POD} -gt 0 ];then
+    echo -e "rm all pending pod with name ${POD_NAME}"
+    sudo hyper list | grep "${POD_NAME}.*pending" | awk '{print $1}' | xargs -i sudo hyper rm {}
+  fi
+
+  title "current pod (${POD_NAME})"
   sudo hyper list | sed -n '1p;/'${POD_NAME}'/p'
   echo -e "\nclean pod done!"
 }
@@ -622,6 +631,7 @@ if [ $# -eq 1 ]; then
     install_sysbench
   elif [ "$1" == "clean" ];then
     clean_pod
+    echo -e "\n===============================================================================================\n"
     clean_docker
   elif [ "$1" == "test" ]; then
     echo "[ full test ]"
