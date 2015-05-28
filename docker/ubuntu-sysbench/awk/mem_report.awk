@@ -3,6 +3,9 @@
 BEGIN{
 }
 /Memory Test -/{
+  if ($8=="host"){$8="1|"$8}
+  if ($8=="docker"){$8="2|"$8}
+  if ($8=="hyper"){$8="3|"$8}
   target=$8" | mem | "$5"-"$6
 }
 /^test_case: /{
@@ -34,8 +37,8 @@ BEGIN{
   f_max[key]=$2
 }
 END{
-  print "| target | item | test-mode | test-case | threads | total-size | speed(MB/sec) | time(sec) | min(ms) | avg(ms) | max(ms) |"
-  print "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"
+  print "| no | target | item | test-mode | test-case | threads | total-size | speed(MB/sec) | time(sec) | min(ms) | avg(ms) | max(ms) |"
+  print "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"
   for ( i in f_time ){
     printf "| %-6s | %s | %s | %s | %s | %s | %s | %s |\n", i, f_threads[i], f_totol_size[i], f_speed[i], f_time[i], f_min[i], f_avg[i], f_max[i]
   }

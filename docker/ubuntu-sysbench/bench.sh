@@ -60,8 +60,8 @@ function generate_test_case() {
     #--max-requests(10000*), --percentile(95*), --num-threads(1*), --cpu-max-prime
     SYS_CPU_CASE=( "${MAX_REQUESTS} 95 1 10000"  "${MAX_REQUESTS} 95 ${CPU_NUM} 50000" )
 
-    #--max-requests(10000*), --percentile(95*), --num-threads(1*), --memory-scope(global*|local), --memory-total-size(100G*)
-    SYS_MEM_CASE=( "${MAX_REQUESTS} 95 1 global 100G"  "${MAX_REQUESTS} 95 ${CPU_NUM} global 100G" )
+    #--max-requests(10000*), --percentile(95*), --num-threads(1*), --memory-scope(global*|local), --memory-total-size(100G*) --memory-block-size(1K*)
+    SYS_MEM_CASE=( "${MAX_REQUESTS} 95 1 global 10G 1M"  "${MAX_REQUESTS} 95 ${CPU_NUM} global 10G 1M" )
 
     #--max-requests(10000*), --percentile(95*), --num-threads(1*), --file-total-size(2G), --file-block-size(16384*), --file-num(128*)
     SYS_IO_CASE=( "${MAX_REQUESTS} 95 1 1G $((16*1024)) 128"  "${MAX_REQUESTS} 95 ${CPU_NUM} 2G $((1024*1024)) 64" )
@@ -70,8 +70,8 @@ function generate_test_case() {
     #--max-requests(10000*), --percentile(95*), --num-threads(1*), --cpu-max-prime
     SYS_CPU_CASE=( "${MAX_REQUESTS} 95 1 1000"  "${MAX_REQUESTS} 95 ${CPU_NUM} 5000" )
 
-    #--max-requests(10000*), --percentile(95*), --num-threads(1*), --memory-scope(global*|local), --memory-total-size(100G*)
-    SYS_MEM_CASE=( "${MAX_REQUESTS} 95 1 global 1G"  "${MAX_REQUESTS} 95 ${CPU_NUM} global 2G" )
+    #--max-requests(10000*), --percentile(95*), --num-threads(1*), --memory-scope(global*|local), --memory-total-size(100G*), --memory-block-size(1K*)
+    SYS_MEM_CASE=( "${MAX_REQUESTS} 95 1 global 1G 1M"  "${MAX_REQUESTS} 95 ${CPU_NUM} global 1G 1M" )
 
     #--max-requests(10000*), --percentile(95*), --num-threads(1*), --file-total-size(2G), --file-block-size(16384*), --file-num(128*)
     SYS_IO_CASE=( "${MAX_REQUESTS} 95 1 4M $((16*1024)) 1"  "${MAX_REQUESTS} 95 ${CPU_NUM} 8M $((1024*1024)) 4" )
@@ -116,7 +116,7 @@ function show_test_parameter() {
   echo "${CYAN}"
 
   echo "-------- memory test parameter---------"
-  echo -e "| No. | max-requests | percentile | num-threads | memory-scope | memory-total-size |"
+  echo -e "| No. | max-requests | percentile | num-threads | memory-scope | memory-total-size | memory-block-size |"
   echo -n "${WHITE}"
   echo -e "| 1 | ${SYS_MEM_CASE[0]// / | } |"
   echo -e "| 2 | ${SYS_MEM_CASE[1]// / | } |"
@@ -461,13 +461,13 @@ function do_cpu_test() {
 
 
 function memtest_cmd() {
-  echo "${SYSBENCH} --test=memory --max-requests=$1 --percentile=$2 --num-threads=$3 --memory-scope=$4 --memory-total-size=$5 --memory-oper=$6 --memory-access-mode=$7 run"
+  echo "${SYSBENCH} --test=memory --max-requests=$1 --percentile=$2 --num-threads=$3 --memory-scope=$4 --memory-total-size=$5 --memory-block-size=$6 --memory-oper=$7 --memory-access-mode=$8 run"
 }
 
 function do_memory_test() {
   TEST_TARGET=("$1")
 
-  PARAM_NUM=5 # max-requests | percentile | num-threads | memory-scope | memory-total-size
+  PARAM_NUM=6 # max-requests | percentile | num-threads | memory-scope | memory-total-size | memory-block-size
   title "${LIGHT}${GREEN}Execute Memory Test in [ $1 ] ${RESET}"
   for (( i = 0 ; i < ${#SYS_MEM_CASE[@]} ; i++ ))
   do
@@ -484,13 +484,14 @@ function do_memory_test() {
     _NUM_THREADS=${TEST_PARAM[2]}
     _MEM_SCOPE=${TEST_PARAM[3]}
     _MEM_TOTAL_SIZE=${TEST_PARAM[4]}
+    _MEM_BLOCK_SIZE=${TEST_PARAM[5]}
 
     for oper in read write
     do
       for mode in seq rnd
       do
 
-        TEST_CMD="$(memtest_cmd ${_MAX_REQUESTS} ${_PERCENTILE} ${_NUM_THREADS} ${_MEM_SCOPE} ${_MEM_TOTAL_SIZE} ${oper} ${mode} )"
+        TEST_CMD="$(memtest_cmd ${_MAX_REQUESTS} ${_PERCENTILE} ${_NUM_THREADS} ${_MEM_SCOPE} ${_MEM_TOTAL_SIZE} ${_MEM_BLOCK_SIZE} ${oper} ${mode} )"
 
         #start test cpu in host
         if (echo "${TEST_TARGET[@]}" | grep -w "host" &>/dev/null);then
