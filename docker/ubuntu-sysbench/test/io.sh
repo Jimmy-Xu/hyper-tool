@@ -27,6 +27,10 @@ fi
 TEST_START_TS=$( date +"%s" )
 TEST_START_TIME=$( date +"%F %T" )
 
+echo "${SYSBENCH} --test=fileio --file-total-size=$4 --file-num=$6 prepare >/dev/null 2>&1 && \
+${SYSBENCH} --test=fileio --max-requests=$1 --percentile=$2 --num-threads=$3 --file-total-size=$4 --file-block-size=$5 --file-num=$6 --file-test-mode=$7 run; \
+${SYSBENCH} --test=fileio --file-total-size=$4 cleanup"
+
 ${SYSBENCH} --test=fileio --file-total-size=$4 --file-num=$6 prepare >/dev/null 2>&1 && \
 ${SYSBENCH} --test=fileio --max-requests=$1 --percentile=$2 --num-threads=$3 --file-total-size=$4 --file-block-size=$5 --file-num=$6 --file-test-mode=$7 run; \
 ${SYSBENCH} --test=fileio --file-total-size=$4 cleanup
