@@ -441,18 +441,18 @@ function do_cpu_test() {
       TESTCOUNT=$((TESTCOUNT+1))
       title "${TESTCOUNT}. CPU Performance Test - hyper"
       echo "test_case: ${test_case// /-}"
-      # CONTAINER_ID=$(hyper_get_container_id)
-      # if [ "${CONTAINER_ID}" == " " ];then
-      #   echo "hyper container not exist, exit!" && exit 1
-      # fi
-      # show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} ${TEST_CMD} ]${WHITE}"
-      # if [ "${DRY_RUN}" != "true" ];then
-      #   sudo hyper exec ${CONTAINER_ID} ${TEST_CMD}
-      # fi
-      show_test_cmd  " [ sudo hyper run ${DOCKER_IMAGE} ${TEST_CMD} ]${WHITE}"
-      if [ "${DRY_RUN}" != "true" ];then
-        sudo hyper run ${DOCKER_IMAGE} ${TEST_CMD}
+      CONTAINER_ID=$(hyper_get_container_id)
+      if [ "${CONTAINER_ID}" == " " ];then
+        echo "hyper container not exist, exit!" && exit 1
       fi
+      show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} ${TEST_CMD} ]${WHITE}"
+      if [ "${DRY_RUN}" != "true" ];then
+        sudo hyper exec ${CONTAINER_ID} ${TEST_CMD}
+      fi
+      # show_test_cmd  " [ sudo hyper run ${DOCKER_IMAGE} ${TEST_CMD} ]${WHITE}"
+      # if [ "${DRY_RUN}" != "true" ];then
+      #   sudo hyper run ${DOCKER_IMAGE} ${TEST_CMD}
+      # fi
       show_test_duration "hyper - cpu" "${test_case}"
     fi
     echo "${RESET}"
@@ -524,18 +524,18 @@ function do_memory_test() {
           TESTCOUNT=$((TESTCOUNT+1))
           title "${TESTCOUNT}. Memory Test - $mode $oper - hyper"
           echo "test_case: ${test_case// /-}"
-          # CONTAINER_ID=$(hyper_get_container_id)
-          # if [ "${CONTAINER_ID}" == " " ];then
-          #   echo "hyper container not exist, exit!" && exit 1
-          # fi
-          # show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} ${TEST_CMD} ]${BLUE}"
-          # if [ "${DRY_RUN}" != "true" ];then
-          #   sudo hyper exec ${CONTAINER_ID} ${TEST_CMD}
-          # fi
-          show_test_cmd  " [ sudo hyper run ${DOCKER_IMAGE} ${TEST_CMD} ]${BLUE}"
-          if [ "${DRY_RUN}" != "true" ];then
-            sudo hyper run ${DOCKER_IMAGE} ${TEST_CMD}
+          CONTAINER_ID=$(hyper_get_container_id)
+          if [ "${CONTAINER_ID}" == " " ];then
+            echo "hyper container not exist, exit!" && exit 1
           fi
+          show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} ${TEST_CMD} ]${BLUE}"
+          if [ "${DRY_RUN}" != "true" ];then
+            sudo hyper exec ${CONTAINER_ID} ${TEST_CMD}
+          fi
+          # show_test_cmd  " [ sudo hyper run ${DOCKER_IMAGE} ${TEST_CMD} ]${BLUE}"
+          # if [ "${DRY_RUN}" != "true" ];then
+          #   sudo hyper run ${DOCKER_IMAGE} ${TEST_CMD}
+          # fi
           show_test_duration "hyper - mem - ${mode} ${oper}" "${test_case}"
         fi
         echo "${RESET}"
@@ -608,19 +608,19 @@ function do_io_test() {
         TESTCOUNT=$((TESTCOUNT+1))
         title "${TESTCOUNT}. IO Test - ${test_mode} - hyper"
         echo "test_case: ${test_case// /-}"
-        # CONTAINER_ID=$(hyper_get_container_id)
-        # echo "CONTAINER_ID:[$CONTAINER_ID]"
-        # if [ "${CONTAINER_ID}" == " " ];then
-        #   echo "hyper container not exist, exit!" && exit 1
-        # fi
-        # show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} /bin/bash -c \"/root/test/io.sh ${_MAX_REQUESTS} ${_PERCENTILE} ${_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}\" ]${BLUE}"
-        # if [ "${DRY_RUN}" != "true" ];then
-        #   sudo hyper exec ${CONTAINER_ID} /bin/bash -c "/root/test/io.sh ${_MAX_REQUESTS} ${_PERCENTILE} ${_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}"
-        # fi
-        show_test_cmd  " [ sudo hyper run ${DOCKER_IMAGE} /bin/bash -c \"/root/test/io.sh ${_MAX_REQUESTS} ${_PERCENTILE} ${_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}\" ]${BLUE}"
-        if [ "${DRY_RUN}" != "true" ];then
-          sudo hyper run ${DOCKER_IMAGE} /bin/bash -c "/root/test/io.sh ${_MAX_REQUESTS} ${_PERCENTILE} ${_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}"
+        CONTAINER_ID=$(hyper_get_container_id)
+        echo "CONTAINER_ID:[$CONTAINER_ID]"
+        if [ "${CONTAINER_ID}" == " " ];then
+          echo "hyper container not exist, exit!" && exit 1
         fi
+        show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} /bin/bash -c \"/root/test/io.sh ${_MAX_REQUESTS} ${_PERCENTILE} ${_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}\" ]${BLUE}"
+        if [ "${DRY_RUN}" != "true" ];then
+          sudo hyper exec ${CONTAINER_ID} /bin/bash -c "/root/test/io.sh ${_MAX_REQUESTS} ${_PERCENTILE} ${_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}"
+        fi
+        # show_test_cmd  " [ sudo hyper run ${DOCKER_IMAGE} /bin/bash -c \"/root/test/io.sh ${_MAX_REQUESTS} ${_PERCENTILE} ${_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}\" ]${BLUE}"
+        # if [ "${DRY_RUN}" != "true" ];then
+        #   sudo hyper run ${DOCKER_IMAGE} /bin/bash -c "/root/test/io.sh ${_MAX_REQUESTS} ${_PERCENTILE} ${_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}"
+        # fi
         show_test_duration "hyper - io - ${test_mode}" "${test_case}"
       fi
       echo "${RESET}"
