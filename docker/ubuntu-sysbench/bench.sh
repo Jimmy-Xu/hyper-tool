@@ -8,8 +8,8 @@ JQ=${BASE_DIR}/../../util/jq
 SYSBENCH=$(which sysbench)
 
 #for dev
-DRY_RUN="true"
-#DRY_RUN="false"
+#DRY_RUN="true"
+DRY_RUN="false"
 
 #EXEC_MODE="live"
 EXEC_MODE="dev"

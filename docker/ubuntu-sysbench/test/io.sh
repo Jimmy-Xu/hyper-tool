@@ -2,7 +2,7 @@
 
 SYSBENCH=/usr/local/bin/sysbench
 
-${SYSBENCH}
+${SYSBENCH} --version
 if [ $? -ne 0 ];then
 	echo "sysbench not installed, exit!"
 	exit 1

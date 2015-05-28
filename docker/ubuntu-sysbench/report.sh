@@ -1,7 +1,9 @@
 #!/bin/bash
 
+LOG_DIR=log
+AWK_DIR=awk
 LOG_FILE="bench.log"
 
-dos2unix log/${LOG_FILE}
+dos2unix ${LOG_DIR}/${LOG_FILE}
 
-cat log/${LOG_FILE} | grep -A22 "CPU Performance Test" | awk -f awk/cpu_report.awk
+cat ${LOG_DIR}/${LOG_FILE} | grep -A22 "CPU Performance Test" | awk -f ${AWK_DIR}/cpu_report.awk
