@@ -572,9 +572,9 @@ function do_io_test() {
         if [ "${CONTAINER_ID}" == " " ];then
           echo "hyper container not exist, exit!" && exit 1
         fi
-        show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} /bin/bash -c /root/test/io.sh \"${_NUM_THREADS} ${_MAX_REQUESTS} ${_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}\" ]${BLUE}"
+        show_test_cmd  " [ sudo hyper exec ${CONTAINER_ID} /bin/bash -c \"/root/test/io.sh ${_MAX_REQUESTS} ${_PERCENTILE} ${_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}\" ]${BLUE}"
         if [ "${DRY_RUN}" != "true" ];then
-          sudo hyper exec ${CONTAINER_ID} /bin/bash -c "/root/test/io.sh ${_NUM_THREADS} ${_MAX_REQUESTS} ${_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}"
+          sudo hyper exec ${CONTAINER_ID} /bin/bash -c "/root/test/io.sh ${_MAX_REQUESTS} ${_PERCENTILE} ${_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}"
         fi
         #sudo hyper run ${DOCKER_IMAGE} /bin/bash -c /bin/bash -c "/root/test/io.sh ${_NUM_THREADS} ${_MAX_REQUESTS} ${_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}"
         show_test_time "hyper - io - ${test_mode}" "${test_case}"

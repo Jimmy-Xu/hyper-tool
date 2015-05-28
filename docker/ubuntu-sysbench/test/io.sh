@@ -1,15 +1,39 @@
 #!/bin/bash
 
-_NUM_THREADS=$1
-_MAX_REQUESTS=$2
-_FILE_SIZE=$3
-_FILE_TEST_MODE=$4
+SYSBENCH=/usr/local/bin/sysbench
 
-echo "_NUM_THREADS   : ${_NUM_THREADS}"
-echo "_MAX_REQUESTS  : ${_MAX_REQUESTS}"
-echo "_FILE_SIZE     : ${_FILE_SIZE}"
-echo "_FILE_TEST_MODE: ${_FILE_TEST_MODE}"
+${SYSBENCH}
+if [ $? -ne 0 ];then
+	echo "sysbench not installed, exit!"
+	exit 1
+fi
 
-/usr/local/bin/sysbench --test=fileio --file-total-size=${_FILE_SIZE}G prepare
-/usr/local/bin/sysbench --test=fileio --file-total-size=${_FILE_SIZE}G --num-threads=${_NUM_THREADS} --max-requests=${_MAX_REQUESTS} --file-test-mode=${_FILE_TEST_MODE} run
-/usr/local/bin/sysbench --test=fileio --file-total-size=${_FILE_SIZE}G cleanup
+PARAM_NUM=7
+if [ $# -ne ${PARAM_NUM} ];then
+	echo "number of parameter should be ${PARAM_NUM}, but current is $#, exit"
+	exit 1
+fi
+
+echo "_MAX_REQUESTS    : $1 "
+echo "_PERCENTILE      : $2 "
+echo "_NUM_THREADS     : $3 "
+echo "_FILE_TOTAL_SIZE : $4 "
+echo "_FILE_BLOCK_SIZE : $5 "
+echo "_FILE_NUM        : $6 "
+echo "_FILE_TEST_MODE  : $7 "
+
+
+echo "start test io in hyper"
+TEST_START_TS=$( date +"%s" )
+TEST_START_TIME=$( date +"%F %T" )
+
+${SYSBENCH} --test=fileio --file-total-size=$4 --file-num=$6 prepare && \
+${SYSBENCH} --test=fileio --max-requests=$1 --percentile=$2 --num-threads=$3 --file-total-size=$4 --file-block-size=$5 --file-num=$6 --file-test-mode=$7 run; \
+${SYSBENCH} --test=fileio --file-total-size=$4 cleanup
+
+TEST_END_TS=$( date +"%s" )
+TEST_END_TIME=$( date +"%F %T" )
+echo
+echo "Test Start(hyper)   : ${START_TIME}"
+echo "Test End(hyper)     : ${END_TIME}"
+echo "Test Duration(hyper): $((TEST_END_TS - TEST_START_TS)) (sec)"
