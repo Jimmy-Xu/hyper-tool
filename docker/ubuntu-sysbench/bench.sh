@@ -221,7 +221,31 @@ function clean_pod() {
 
   echo -e "\n3.list pod ${POD_NAME}"
   sudo hyper list | sed -n '1p;/'${POD_NAME}'/p'
-  echo -e "\nclean done"
+  echo -e "\nclean pod done!"
+}
+
+function clean_docker() {
+  title "Clean old container and images from ${POD_NAME}"
+
+  OLD_CONTAINER=$(docker ps -a | awk '{print $2,$1}' | grep "${DOCKER_IMAGE}" | wc -l)
+  echo "old container from ${DOCKER_IMAGE} : ${OLD_CONTAINER}"
+  if [ ${OLD_CONTAINER} -gt 0 ];then
+    echo "remove old container"
+    docker rm $(docker ps -a | awk '{print $2,$1}' | grep "${DOCKER_IMAGE}" | awk '{print $2}') > /dev/null 2>&1
+  fi
+
+  NONE_IMAGES=$(docker images | grep "<none>.*<none>" | wc -l)
+  echo "<none> images : ${NONE_IMAGES}"
+  if [ ${NONE_IMAGES} -gt 0 ];then
+    echo "remove <none>:<none> docker images"
+    sudo docker rmi $(docker images | grep "<none>.*<none>" | awk '{print $3}') > /dev/null 2>&1
+  fi
+
+  title "current docker images"
+  docker images
+  title "current docker container"
+  docker ps -a | awk '{print $2,$1}' | grep "${DOCKER_IMAGE}"
+  echo -e "\nclean docker done!"
 }
 
 function pause() {
@@ -598,6 +622,7 @@ if [ $# -eq 1 ]; then
     install_sysbench
   elif [ "$1" == "clean" ];then
     clean_pod
+    clean_docker
   elif [ "$1" == "test" ]; then
     echo "[ full test ]"
     start_test "host docker hyper" "cpu mem io"
