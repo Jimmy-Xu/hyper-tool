@@ -644,11 +644,11 @@ else
   cat <<COMMENT
 
 usage:
-    ./bench.sh init
+    ./bench.sh init   #build Dockerfile for hyper:sysbench
   or
-    ./bench.sh clean
+    ./bench.sh clean  #clean old pod and container
   or
-    ./bench.sh test
+    ./bench.sh test   #start all test
   or
     ./bench.sh test "host docker hyper" "cpu mem io"
 
