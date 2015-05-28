@@ -341,12 +341,14 @@ function show_test_cmd() {
   echo "test command line: ${YELLOW}$1 "
 }
 
-function show_test_time() {
+function show_test_duration() {
   END_TS=$( date +"%s" )
   END_TIME=$( date +"%F %T" )
   TEST_NAME="$1"
   TEST_CASE="$2"
-  echo -e "${LIGHT}${GREEN}[ ${TEST_NAME} - ${TEST_CASE} ]: ${START_TIME} - ${END_TIME} : $((END_TS - START_TS)) (seconds)\n${RESET}"
+  echo "START_TIME: ${START_TIME}"
+  echo "END_TIME : ${END_TIME}"
+  echo -e "${LIGHT}${GREEN}test-duration : ${TEST_NAME} : ${TEST_CASE} : $((END_TS - START_TS)) (seconds)\n${RESET}"
 }
 
 function cputest_cmd() {
@@ -384,7 +386,7 @@ function do_cpu_test() {
       if [ "${DRY_RUN}" != "true" ];then
         bash -c "${TEST_CMD}"
       fi
-      show_test_time "host - cpu" "${test_case}" "${test_case}"
+      show_test_duration "host - cpu" "${test_case}" "${test_case}"
     fi
 
     #start test cpu in docker
@@ -397,7 +399,7 @@ function do_cpu_test() {
       if [ "${DRY_RUN}" != "true" ];then
         docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET// /,} ${DOCKER_IMAGE} ${TEST_CMD}
       fi
-      show_test_time "docker - cpu" "${test_case}"
+      show_test_duration "docker - cpu" "${test_case}"
     fi
 
     #start test cpu inhyper
@@ -415,7 +417,7 @@ function do_cpu_test() {
         sudo hyper exec ${CONTAINER_ID} ${TEST_CMD}
       fi
       #hyper run ${DOCKER_IMAGE} ${TEST_CMD}
-      show_test_time "hyper - cpu" "${test_case}"
+      show_test_duration "hyper - cpu" "${test_case}"
     fi
     echo "${RESET}"
   done
@@ -464,7 +466,7 @@ function do_memory_test() {
           if [ "${DRY_RUN}" != "true" ];then
             bash -c "${TEST_CMD}"
           fi
-          show_test_time "host - mem - ${mode} ${oper}" "${test_case}"
+          show_test_duration "host - mem - ${mode} ${oper}" "${test_case}"
         fi
 
         #start test cpu in docker
@@ -477,7 +479,7 @@ function do_memory_test() {
           if [ "${DRY_RUN}" != "true" ];then
             docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET// /,} ${DOCKER_IMAGE} ${TEST_CMD}
           fi
-          show_test_time "docker - mem - ${mode} ${oper}" "${test_case}"
+          show_test_duration "docker - mem - ${mode} ${oper}" "${test_case}"
         fi
 
         #start test cpu in hyper
@@ -495,7 +497,7 @@ function do_memory_test() {
             sudo hyper exec ${CONTAINER_ID} ${TEST_CMD}
           fi
           #sudo hyper run ${DOCKER_IMAGE} ${TEST_CMD}
-          show_test_time "hyper - mem - ${mode} ${oper}" "${test_case}"
+          show_test_duration "hyper - mem - ${mode} ${oper}" "${test_case}"
         fi
         echo "${RESET}"
       done
@@ -545,7 +547,7 @@ function do_io_test() {
         if [ "${DRY_RUN}" != "true" ];then
           bash -c "${TEST_CMD}"
         fi
-        show_test_time "host - io - ${test_mode}" "${test_case}"
+        show_test_duration "host - io - ${test_mode}" "${test_case}"
       fi
 
       #start test cpu in docker
@@ -558,7 +560,7 @@ function do_io_test() {
         if [ "${DRY_RUN}" != "true" ];then
           docker run -t --memory=${MEMORY_SIZE}m --cpuset-cpus=${CPU_SET// /,} ${DOCKER_IMAGE} bash -c "${TEST_CMD}"
         fi
-        show_test_time "docker - io - ${test_mode}" "${test_case}"
+        show_test_duration "docker - io - ${test_mode}" "${test_case}"
       fi
 
       #start test cpu in hyper
@@ -577,7 +579,7 @@ function do_io_test() {
           sudo hyper exec ${CONTAINER_ID} /bin/bash -c "/root/test/io.sh ${_MAX_REQUESTS} ${_PERCENTILE} ${_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}"
         fi
         #sudo hyper run ${DOCKER_IMAGE} /bin/bash -c /bin/bash -c "/root/test/io.sh ${_NUM_THREADS} ${_MAX_REQUESTS} ${_NUM_THREADS} ${_FILE_TOTAL_SIZE} ${_FILE_BLOCK_SIZE} ${_FILE_NUM} ${test_mode}"
-        show_test_time "hyper - io - ${test_mode}" "${test_case}"
+        show_test_duration "hyper - io - ${test_mode}" "${test_case}"
       fi
       echo "${RESET}"
     done
