@@ -8,8 +8,8 @@ JQ=${BASE_DIR}/../../util/jq
 SYSBENCH=$(which sysbench)
 
 #for dev
-#DRY_RUN="true"
-DRY_RUN="false"
+DRY_RUN="true"
+#DRY_RUN="false"
 
 EXEC_MODE="live"
 #EXEC_MODE="dev"
@@ -61,7 +61,7 @@ function generate_test_case() {
     SYS_CPU_CASE=( "${MAX_REQUESTS} 95 1 10000"  "${MAX_REQUESTS} 95 ${CPU_NUM} 50000" )
 
     #--max-requests(10000*), --percentile(95*), --num-threads(1*), --memory-scope(global*|local), --memory-total-size(100G*)
-    SYS_MEM_CASE=( "${MAX_REQUESTS} 100 1 local 100G"  "${MAX_REQUESTS} 100 ${CPU_NUM} local 200G" )
+    SYS_MEM_CASE=( "${MAX_REQUESTS} 95 1 global 100G"  "${MAX_REQUESTS} 95 ${CPU_NUM} global 200G" )
 
     #--max-requests(10000*), --percentile(95*), --num-threads(1*), --file-total-size(2G), --file-block-size(16384*), --file-num(128*)
     SYS_IO_CASE=( "${MAX_REQUESTS} 95 1 1G $((16*1024)) 128"  "${MAX_REQUESTS} 95 ${CPU_NUM} 2G $((1024*1024)) 64" )
@@ -71,7 +71,7 @@ function generate_test_case() {
     SYS_CPU_CASE=( "${MAX_REQUESTS} 95 1 1000"  "${MAX_REQUESTS} 95 ${CPU_NUM} 5000" )
 
     #--max-requests(10000*), --percentile(95*), --num-threads(1*), --memory-scope(global*|local), --memory-total-size(100G*)
-    SYS_MEM_CASE=( "${MAX_REQUESTS} 100 1 local 1G"  "${MAX_REQUESTS} 100 ${CPU_NUM} local 2G" )
+    SYS_MEM_CASE=( "${MAX_REQUESTS} 95 1 global 1G"  "${MAX_REQUESTS} 95 ${CPU_NUM} global 2G" )
 
     #--max-requests(10000*), --percentile(95*), --num-threads(1*), --file-total-size(2G), --file-block-size(16384*), --file-num(128*)
     SYS_IO_CASE=( "${MAX_REQUESTS} 95 1 4M $((16*1024)) 1"  "${MAX_REQUESTS} 95 ${CPU_NUM} 8M $((1024*1024)) 4" )
