@@ -13,10 +13,22 @@ is_go_exist
 is_hyper_exist
 
 #main
-cd "$GOPATH/src/${HYPER_CLONE_DIR}"
-if [ -f ./make_deps.sh ]
-then
-	./make_deps.sh
+if [ -d $GOPATH/src/golang.org/x ];then
+	\rm $GOPATH/src/golang.org/x -rf
 fi
+mkdir -p $GOPATH/src/golang.org/x
+
+show_message "clone tools..." green
+git clone https://github.com/golang/tools $GOPATH/src/golang.org/x/tools
+
+show_message "go get godep..." green
+go get github.com/tools/godep
+
+if [ $? -eq 0 ];then
+	show_message "instal deps succeed!" green
+else
+	show_message "instal deps failed!" red
+fi
+
 
 show_message "Done." green

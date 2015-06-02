@@ -3,6 +3,9 @@
 BEGIN{
 }
 /CPU Performance Test/{
+  if ($6=="host"){$6="1|"$6}
+  if ($6=="docker"){$6="2|"$6}
+  if ($6=="hyper"){$6="3|"$6}
   target=$6" | cpu"
 }
 /^test_case: /{
@@ -37,8 +40,8 @@ BEGIN{
   f_max[key]=$2
 }
 END{
-  print "| target | item | test-case | num-threads | cpu-max-prime | total time(sec) | min(ms) | avg(ms) | max(ms) |"
-  print "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"
+  print "| no | target | item | test-case | num-threads | cpu-max-prime | total time(sec) | min(ms) | avg(ms) | max(ms) |"
+  print "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"
   for ( i in f_time ){
     printf "| %-6s | %s | %s | %s | %s | %s | %s |\n", i, f_threads[i], f_primer[i], f_time[i], f_min[i], f_avg[i], f_max[i]
   }

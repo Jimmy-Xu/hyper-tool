@@ -18,10 +18,13 @@ FAIL="${RED}fail${RESET}"
 
 #main
 cd "$GOPATH/src/${HYPER_CLONE_DIR}"
-if [ -f hyperd.go -a -f hyper.go ]
+show_message "delete old hyper and hyperd" green
+\rm  hyper  hyperd -rf
+
+if [ -f hyperd.go -a -f hyper.go -a ! -f hyperd -a ! -f hyper ]
 then
 	show_message "[Step 1] build hyper.go" green
-	go build hyper.go
+	godep go build hyper.go
 	if [ $? -eq 0 ]
 	then
 		RLT_BLT_HYPER="${SUCCESS}"
@@ -30,7 +33,7 @@ then
 	fi
 
 	show_message "[Step 2] build hyperd.go" green
-	go build hyperd.go
+	godep go build hyperd.go
 	if [ $? -eq 0 ]
 	then
 		RLT_BLT_HYPERD="${SUCCESS}"
@@ -47,8 +50,6 @@ then
 	echo "------------------------------------------------------------"
 	ls -l --color hyper hyperd
 	echo "------------------------------------------------------------"
-
-
 fi
 
 show_message "Done." green

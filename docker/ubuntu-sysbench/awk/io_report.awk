@@ -3,6 +3,9 @@
 BEGIN{
 }
 /IO Test -/{
+  if ($7=="host"){$7="1|"$7}
+  if ($7=="docker"){$7="2|"$7}
+  if ($7=="hyper"){$7="3|"$7}
   target=$7" | io | "$5
 }
 /^test_case: /{
@@ -50,8 +53,8 @@ BEGIN{
   f_max[key]=$2
 }
 END{
-  print "| target | item | test-mode | test-case | threads | total-size | block-size | speed(MB/sec) | time(sec) | min(ms) | avg(ms) | max(ms) |"
-  print "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"
+  print "| no | target | item | test-mode | test-case | threads | total-size | block-size | speed(MB/sec) | time(sec) | min(ms) | avg(ms) | max(ms) |"
+  print "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"
   for ( i in f_time ){
     printf "| %-6s | %s | %s | %s | %s | %s | %s | %s | %s |\n", i, f_threads[i], f_totol_size[i], f_block_size[i], f_speed[i], f_time[i], f_min[i], f_avg[i], f_max[i]
   }
