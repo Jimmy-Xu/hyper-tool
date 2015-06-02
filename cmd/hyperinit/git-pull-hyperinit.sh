@@ -3,7 +3,7 @@
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 . ${BASE_DIR}/../common.sh
 
-show_message "pulling hyperinit repo..." green
+show_message "pulling ${HYPERINIT_CLONE_DIR} repo..." green
 
 #check if hyperinit already exist
 is_hyperinit_exist

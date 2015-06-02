@@ -10,8 +10,8 @@ HYPER_REPO="https://github.com/getdvm/dvm-cli.git"
 HYPER_CLONE_DIR="hyper"
 
 #for hyperinit repo
-HYPERINIT_REPO="https://github.com/hyperhq/hyperStart.git"
-HYPERINIT_CLONE_DIR="hyperStart"
+HYPERINIT_REPO="https://github.com/getdvm/dvminit.git"
+HYPERINIT_CLONE_DIR="hyperstart"
 
 #for golang
 GOROOT_DIR=~/go

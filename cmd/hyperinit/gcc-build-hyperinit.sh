@@ -47,20 +47,6 @@ then
 					if [ $? -eq 0 ]
 					then
 						MAKE_OK="${SUCCESS}"
-						show_message "[Step 4] start compress initrd-dvm" green
-						if [ -f src/init -a -d test/root ]
-						then
-							cp src/init test/root/
-							cd test/root/
-							find . | cpio -ovHnewc | gzip -9 > ../initrd-dvm.img
-							if [ $? -eq 0 ]
-							then
-								COMPRESS_OK="${SUCCESS}"
-							else
-								COMPRESS_OK="${FAIL}"
-							fi
-						fi
-
 					else
 						MAKE_OK="${FAIL}"
 					fi
@@ -83,13 +69,12 @@ echo "==================================${RESET}"
 echo "[Step 1] ./autogen.sh    => ${AUTOGEN_OK}"
 echo "[Step 2] ./configure     => ${CONFIGURE_OK}"
 echo "[Step 3] ./make          => ${MAKE_OK}"
-echo "[Step 4] compress initrd => ${COMPRESS_OK}"
 echo
 echo "${BOLD}${YELLOW}=================================="
 echo "list result:"
 echo "==================================${RESET}"
 cd "$GOPATH/src/${HYPERINIT_CLONE_DIR}"
-ls -l --color test/{kernel,initrd-dvm.img}
+ls -l --color build/{kernel,hyper-initrd.img}
 echo
 
 

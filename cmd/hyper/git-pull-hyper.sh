@@ -3,7 +3,7 @@
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
 . ${BASE_DIR}/../common.sh
 
-show_message "pulling hyper repo..." green
+show_message "pulling ${HYPER_CLONE_DIR} repo..." green
 
 #check GOPATH
 is_gopath_exist
