@@ -21,8 +21,8 @@ echo "${QBOOT} + ${TMPFS}"
 
 KERNEL_SRC=${GOPATH}/src/${HYPERINIT_CLONE_DIR}/build/kernel
 INITRD_SRC=${GOPATH}/src/${HYPERINIT_CLONE_DIR}/build/hyper-initrd.img
-BIOS_SRC=${BASE_DIR}/../../../etc/bios-qboot.bin
-CBFS_SRC=${BASE_DIR}/../../../etc/cbfs-qboot.rom
+BIOS_SRC=${BASE_DIR}/../../../boot/bios-qboot.bin
+CBFS_SRC=${BASE_DIR}/../../../boot/cbfs-qboot.rom
 
 
 if [ ${TMPFS} == "tmpfs" ];then
