@@ -138,6 +138,16 @@ then
 
 		echo -e "\nlog file: [ ${BLUE} ${LINK_CURRENT} ${RESET}]"
 
+		HYPERD_CLI=$(ps -ef | grep "sudo ./hyperd.*--config" | grep -v grep | awk '{print substr($0, index($0,"sudo"))}')
+		CONFIG_FILE=$( echo ${HYPERD_CLI} | cut -d"=" -f2 )
+		show_message "config file [ ${CONFIG_FILE} ]" green
+		echo "--------------------------"
+		if [ -f $CONFIG_FILE ];then
+			cat ${CONFIG_FILE}
+		else
+			show_message "Can not find config file ${CONFIG_FILE}" red
+			exit 1
+		fi
 
 	else
 		show_message "please input a number, [ $CHOICE ] isn't a valid number(>=1)" red bold

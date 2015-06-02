@@ -25,8 +25,11 @@ sudo ./hyper list container | grep online | wc -l
 echo -e -n "${BOLD}${WHITE} running pods   : ${RESET}${PURPLE}"
 sudo ./hyper list | grep "pod-.*running" | grep -v ERROR | wc -l
 
-echo -e -n "${BOLD}${WHITE} stopped pods   : ${RESET}${PURPLE}"
-sudo ./hyper list | grep "pod-.*pending" | wc -l
+echo -e -n "${BOLD}${WHITE} stopped(pending) pods   : ${RESET}${PURPLE}"
+sudo ./hyper list | grep -E "pod-.*pending" | wc -l
+
+echo -e -n "${BOLD}${WHITE} stopped(succeeded) pods   : ${RESET}${PURPLE}"
+sudo ./hyper list | grep "pod-.*succeeded" | wc -l
 
 echo -e -n "${BOLD}${WHITE} all pods       : ${RESET}${PURPLE}"
 sudo ./hyper list | grep "pod-.*" | wc -l

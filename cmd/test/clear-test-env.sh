@@ -22,8 +22,12 @@ sudo ./hyper list pod | grep "pod-.*running" | awk '{print $1}' | xargs -i sudo 
 sleep 1
 
 NUM_PENDING_POD=$(sudo ./hyper list pod | grep "pod-.*pending" | wc -l)
-show_message "remove all pending pod: ( ${PURPLE}${NUM_PENDING_POD}${GREEN} )" green
+show_message "remove all stopped(pending) pod: ( ${PURPLE}${NUM_PENDING_POD}${GREEN} )" green
 sudo ./hyper list pod | grep "pod-.*pending" | awk '{print $1}' | xargs -i sudo ./hyper rm {}
+
+NUM_PENDING_POD=$(sudo ./hyper list pod | grep "pod-.*succeeded" | wc -l)
+show_message "remove all stopped(succeeded) pod: ( ${PURPLE}${NUM_PENDING_POD}${GREEN} )" green
+sudo ./hyper list pod | grep "pod-.*succeeded" | awk '{print $1}' | xargs -i sudo ./hyper rm {}
 
 sleep 1
 NUM_QEMU_PROCESS=$(pgrep qemu| wc -l)
@@ -41,8 +45,11 @@ sudo ./hyper list container | grep online | wc -l
 echo -e -n "${BOLD}${WHITE} running pods   : ${RESET}${PURPLE}"
 sudo ./hyper list | grep "pod-.*running" | grep -v ERROR | wc -l
 
-echo -e -n "${BOLD}${WHITE} stopped pods   : ${RESET}${PURPLE}"
+echo -e -n "${BOLD}${WHITE} stopped(pending) pods   : ${RESET}${PURPLE}"
 sudo ./hyper list | grep "pod-.*pending" | wc -l
+
+echo -e -n "${BOLD}${WHITE} stopped(succeeded) pods   : ${RESET}${PURPLE}"
+sudo ./hyper list | grep "pod-.*succeeded" | wc -l
 
 echo -e -n "${BOLD}${WHITE} all pods       : ${RESET}${PURPLE}"
 sudo ./hyper list | grep "pod-" | wc -l
