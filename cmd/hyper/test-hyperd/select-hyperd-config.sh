@@ -9,74 +9,65 @@ show_message "select hyperd config" green
 is_hyper_exist
 
 
-CONFIG_LIST=(config-normal config-gz-s config-lz4)
-
-echo "=============================================================================="
-echo "  1 ${PURPLE}kernel(normal)${RESET}     (2.6M)"
-echo "  2 ${PURPLE}kernel-gz-s${RESET}        (2.3M)  #gzip has balance decompress speed and size"
-echo "  3 ${PURPLE}kernel-lz4${RESET}         (2.7M)  #lz4 is a bit bigger but decompress fast"
-echo "=============================================================================="
-
-echo -e -n "\n${BOLD}${PURPLE}Please input the ${WHITE}No.${PURPLE} of kernel${RESET}(press 'Enter' to cancel):"
-read CHOICE
-
-if [ ! -z ${CHOICE} ]
-then
-	VALID_CHOICE=(1 2 3)
-	if echo "${VALID_CHOICE[@]}" | grep -w "${CHOICE}" &>/dev/null
-	then
-		NO=$((CHOICE-1))
-		CONFIG_DIR=${BASE_DIR}/../../../etc
-		SEL_CONFIG=${CONFIG_DIR}/${CONFIG_LIST[${NO}]}
-
-		show_message "you select [ ${WHITE} ${CONFIG_LIST[${NO}]} ${RESET} ]" green bold
-
-		#create link
-		LINK_CURRENT=${CONFIG_DIR}/config
-		if [ -f ${LINK_CURRENT} ]
-		then
-			show_message "link exist, will remove it first" yellow bold
-			rm ${LINK_CURRENT} -rf
-		fi
-		ln -s ${SEL_CONFIG} ${LINK_CURRENT}
-
-		if [ $? -eq 0 ]
-		then
-			#show_message "create config link succeed:) " green bold
-			cd ${CONFIG_DIR}
-
-			FOUND_CONFIG=$(ls -l --color config | grep ${CONFIG_LIST[${NO}]} | wc -l)
-			if [ ${FOUND_CONFIG} -eq 1 ]
-			then
-				show_message "select config succeed:), current config is:" green bold
-				echo "-----------------------------------------------"
-				cat ${LINK_CURRENT}
-				echo "-----------------------------------------------"
-
-				echo -e -n "\n${BOLD}${PURPLE}Do you want to replace ${WHITE}/etc/hyper/config${PURPLE}? ${RESET}('y' for sure, press 'Enter' to cancel):"
-				read CHOICE
-				if [ ! -z ${CHOICE} -a "${CHOICE}" == "y" ]
-				then
-					sudo cp ${LINK_CURRENT} /etc/hyper/config
-					show_message "show /etc/hyper/config" green
-					cat /etc/hyper/config
-				else
-					show_message "cancel replace /etc/hyper/config" yellow bold
-				fi
-
-			else
-				show_message "select config failed:)" red bold
-			fi
-		else
-			show_message "create config link failed:) " red bold
-		fi
-
-	else
-		show_message "valid choid is (${VALID_CHOICE[@]}), cancel"
-	fi
-else
-	show_message "cancel"
+if [ $# -ne 2 ];then
+	echo "parameter error, parameter should be <qboot|noqboot> <tmpfs|notmpfs>"
+	exit 1
 fi
 
+QBOOT=$1
+TMPFS=$2
+
+echo "${QBOOT} + ${TMPFS}"
+
+KERNEL_SRC=${GOPATH}/src/${HYPERINIT_CLONE_DIR}/build/kernel
+INITRD_SRC=${GOPATH}/src/${HYPERINIT_CLONE_DIR}/build/hyper-initrd.img
+BIOS_SRC=${BASE_DIR}/../../../etc/bios-qboot.bin
+CBFS_SRC=${BASE_DIR}/../../../etc/cbfs-qboot.rom
+
+
+if [ ${TMPFS} == "tmpfs" ];then
+	TGT_DIR=/run/hyper
+elif [ ${TMPFS} == "notmpfs" ];then
+	TGT_DIR=/var/lib/hyper
+fi
+mkdir -p ${TGT_DIR}
+sudo cp ${KERNEL_SRC} ${TGT_DIR}
+sudo cp ${INITRD_SRC} ${TGT_DIR}
+sudo cp ${BIOS_SRC} ${TGT_DIR}
+sudo cp ${CBFS_SRC} ${TGT_DIR}
+
+if [ -f ${BASE_DIR}/../../../etc/config ];then
+	show_message "remove old config"
+	\rm -rf ${BASE_DIR}/../../../etc/config
+fi
+
+echo "Kernel=${TGT_DIR}/kernel" > ${BASE_DIR}/../../../etc/config
+echo "Initrd=${TGT_DIR}/hyper-initrd.img" >> ${BASE_DIR}/../../../etc/config
+
+if [ ${QBOOT} == "qboot" ];then
+	echo "Bios=${TGT_DIR}/bios-qboot.bin" >> ${BASE_DIR}/../../../etc/config
+	echo "Cbfs=${TGT_DIR}/cbfs-qboot.rom" >> ${BASE_DIR}/../../../etc/config
+elif [ ${QBOOT} == "noqboot" ];then
+	echo "#Bios=${TGT_DIR}/bios-qboot.bin" >> ${BASE_DIR}/../../../etc/config
+	echo "#Cbfs=${TGT_DIR}/cbfs-qboot.rom" >> ${BASE_DIR}/../../../etc/config
+fi
+
+show_message "new config file: ${BASE_DIR}/../../../etc/config" green
+echo "-- config file content -------------------------------------"
+cat ${BASE_DIR}/../../../etc/config
+
+show_message "kernel, initrd, bios and rom under ${TGT_DIR}" green
+echo "------------------------------------------------------------"
+if [ ${QBOOT} == "qboot" ];then
+	ls -l --color ${TGT_DIR}/{kernel,hyper-initrd.img,bios-qboot.bin,cbfs-qboot.rom}
+else
+	ls -l --color ${TGT_DIR}/{kernel,hyper-initrd.img}
+fi
+
+if [ $? -eq 0 ];then
+	show_message "select config succeed!" green
+else
+	show_message "select config failed!" red
+fi
 
 show_message "Done." green

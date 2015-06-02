@@ -1,2 +1,0 @@
-Kernel=/run/hyper-kernel/kernel-gz-s
-Initrd=/run/hyper-kernel/initrd-dvm.img
