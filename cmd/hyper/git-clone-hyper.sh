@@ -37,6 +37,17 @@ then
 		rm ${TARGET_DIR} -rf
 	fi
 
+	echo -e -n "\n${BOLD}${PURPLE} clone dev or live repo${RESET}?('d' for dev, 'l' for live, 'Enter' for cancel)"
+	read -n2 CHOICE
+	case ${CHOICE} in
+		d) HYPER_REPO=${HYPER_REPO_DEV}
+		;;
+		l) HYPER_REPO=${HYPER_REPO_LIVE}
+		;;
+		*) exit 1
+		;;
+	esac
+
 	show_message "start clone ${BLUE}<${HYPER_REPO}> ${WHITE}to ${BLUE}<${TARGET_DIR}>${RESET}" green
 	echo "--------------------------------------------"
 	git clone ${HYPER_REPO} ${HYPER_CLONE_DIR}
