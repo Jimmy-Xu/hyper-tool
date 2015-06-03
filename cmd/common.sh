@@ -18,7 +18,8 @@ GOROOT_DIR=~/go
 GOPATH_DIR=~/gopath
 #golang filename
 GOLANG=go1.4.2.linux-amd64
-GOLANG_URL=https://storage.googleapis.com/golang/${GOLANG}.tar.gz
+#GOLANG_URL=https://storage.googleapis.com/golang/${GOLANG}.tar.gz
+GOLANG_URL=http://www.golangtc.com/static/go/${GOLANG}.tar.gz
 
 #kernel in tmpfs
 HYPER_KERNEL_DIR=/run/hyper-kernel
