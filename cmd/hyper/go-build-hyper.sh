@@ -21,10 +21,20 @@ cd "$GOPATH/src/${HYPER_CLONE_DIR}"
 show_message "delete old hyper and hyperd" green
 \rm  hyper  hyperd -rf
 
+show_message "Check godep" green
+if [ -f make_deps.sh ];then
+	show_message "build without godep" yellow
+	GODEP=""
+else
+	show_message "build with godep" yellow
+	GODEP="godep "
+fi
+
+
 if [ -f hyperd.go -a -f hyper.go -a ! -f hyperd -a ! -f hyper ]
 then
 	show_message "[Step 1] build hyper.go" green
-	godep go build hyper.go
+	${GODEP} go build hyper.go
 	if [ $? -eq 0 ]
 	then
 		RLT_BLT_HYPER="${SUCCESS}"
@@ -33,7 +43,7 @@ then
 	fi
 
 	show_message "[Step 2] build hyperd.go" green
-	godep go build hyperd.go
+	${GODEP} go build hyperd.go
 	if [ $? -eq 0 ]
 	then
 		RLT_BLT_HYPERD="${SUCCESS}"
