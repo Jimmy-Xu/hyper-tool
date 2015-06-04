@@ -30,7 +30,7 @@ if [ ${TMPFS} == "tmpfs" ];then
 elif [ ${TMPFS} == "notmpfs" ];then
 	TGT_DIR=/var/lib/hyper
 fi
-mkdir -p ${TGT_DIR}
+sudo mkdir -p ${TGT_DIR}
 sudo cp ${KERNEL_SRC} ${TGT_DIR}
 sudo cp ${INITRD_SRC} ${TGT_DIR}
 sudo cp ${BIOS_SRC} ${TGT_DIR}
