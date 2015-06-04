@@ -205,7 +205,7 @@ then
 				sudo ${HYPER_CLI} list | sort | grep -E "("${POD_NEW_LIST}")" | grep -n -E "(running|pending)" --color
 
 
-				STAT_RLT=$(grep -A1 "^Successful to replace" "${LOG_FILE}" | grep real | cut -d"m" -f2 | cut -d"s" -f1 \
+				STAT_RLT=$(grep -A2 "^Successfully replaced" "${LOG_FILE}" | grep real | cut -d"m" -f2 | cut -d"s" -f1 \
 				| awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1< min) {min=$1}; total+=$1; count+=1} END { if (count>0){ printf "%.0f | %.0f | %.0f",min*1000,max*1000,total/count*1000}else{print ""}; }')
 
 
