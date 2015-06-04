@@ -648,7 +648,7 @@ function main(){
   git config --global alias.sr 'show-ref'
   git config --global alias.cm '!sh -c "br_name=`git symbolic-ref HEAD|sed s#refs/heads/##`; git commit -em \"[\${br_name}] \""'
   #git config --global alias.lg "log --graph --pretty=format:'%Cred%h%Creset -%x09%C(yellow)%d%Creset [%cd] %C(cyan)[%an]%Creset %x09 %s%Creset' --abbrev-commit --date=short"
-  git config --global alias.lg "log --graph --pretty=format:'[%ci] %Cgreen(%cr) %Cred%h%Creset -%x09%C(yellow)%Creset %C(cyan)[%an]%Creset %x09 %s %Cgreen(%cr)%Creset' --abbrev-commit --date=short"
+  git config --global alias.lg "log --graph --pretty=format:'[%ci] %Cgreen(%cr) %Cred%h%Creset -%x09%C(yellow)%Creset %C(cyan)[%an]%Creset %x09 %s' --abbrev-commit --date=short"
   git config --global push.default current
 
 

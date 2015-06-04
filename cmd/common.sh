@@ -109,7 +109,7 @@ function show_repo_info() {
 
 		echo -e "\n${BOLD}${CYAN}-------------------- git lg ----------------------${RESET}"
 		#ensure local alias.lg
-		git config --list | grep "alias.log" > /dev/null || git config alias.lg "log --graph --pretty=format:'[%ci] %Cgreen(%cr) %Cred%h%Creset -%x09%C(yellow)%Creset %C(cyan)[%an]%Creset %x09 %s %Cgreen(%cr)%Creset' --abbrev-commit --date=short"
+		git config --list | grep "alias.log" > /dev/null || git config alias.lg "log --graph --pretty=format:'[%ci] %Cgreen(%cr) %Cred%h%Creset -%x09%C(yellow)%Creset %C(cyan)[%an]%Creset %x09 %s' --abbrev-commit --date=short"
 		#show git log
 		LOG_LEN=$(git lg --since=yesterday | wc -l)
 		if [ ${LOG_LEN} -eq 0 ]
